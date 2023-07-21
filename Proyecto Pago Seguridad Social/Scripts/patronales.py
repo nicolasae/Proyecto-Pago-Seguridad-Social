@@ -52,6 +52,5 @@ def delete_columns_by_words(file_path, words_to_delete):
     # Delete the corresponding columns from the CSV file
     for index_col in sorted(columns_to_delete, reverse=True):
         delete_column_by_index(file_path, index_col)
-words_to_delete = ["UNIDAD 3", "UNIDAD 4", "UNIDAD 5","DSCTO ASMETSALUD PARA SANITAS"]  # List of words to trigger column deletion
 
 delete_columns_by_words(csv_file_path, words_to_delete)

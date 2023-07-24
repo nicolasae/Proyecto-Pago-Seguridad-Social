@@ -6,7 +6,7 @@ from django.conf import settings
 
 from .models import Gasto, Entidad
 
-def cargar_datos_entidades(request):
+def load_data_entidades(request):
     if request.method == 'POST' and request.FILES.get('formFile'):
         archivo_adjunto = request.FILES['formFile']
         save_path = save_uploaded_file(archivo_adjunto)
@@ -28,7 +28,7 @@ def cargar_datos_entidades(request):
             # You can add an error message in the response or redirect to an error page
             # return render(request, 'error.html')
 
-    return render(request, 'entidad/cargar_datos_entidades.html')
+    return render(request, 'entidad/load_data_entidades.html')
 
 def save_uploaded_file(uploaded_file):
     new_file_name = "datos entidades.xlsx"
@@ -65,3 +65,8 @@ def process_entidad_row(row):
         codigo=row[6]
     )
     entidad.save()
+
+def list_entidad(request):
+    entidades = Entidad.objects.all()
+    print(entidades[0].idTipoGasto)
+    return render(request, 'entidad/lista_entidades.html', {'entidades':entidades})

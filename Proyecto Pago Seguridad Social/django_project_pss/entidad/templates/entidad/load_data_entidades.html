@@ -1,0 +1,20 @@
+{% extends "entidad/base.html" %}
+
+{% block title %}Datos entidades{% endblock %}
+
+{% block content %}
+
+    <h1>Cargar datos entidades</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Seleccione Archivo</label>
+            <input class="form-control" type="file" name="formFile" id="formFile">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cargar</button>
+    </form>
+
+{% endblock %}
+      

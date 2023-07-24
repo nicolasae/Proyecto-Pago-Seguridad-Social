@@ -69,4 +69,4 @@ def process_entidad_row(row):
 def list_entidad(request):
     entidades = Entidad.objects.all()
     print(entidades[0].idTipoGasto)
-    return render(request, 'entidad/lista_entidades.html', {'entidades':entidades})
+    return render(request, 'entidad/list_entidades.html', {'entidades':entidades})

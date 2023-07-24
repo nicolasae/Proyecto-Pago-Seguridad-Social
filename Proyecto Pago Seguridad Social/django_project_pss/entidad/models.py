@@ -19,7 +19,7 @@ class Gasto(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)
 
     def __str__(self):
-        return self.tipo
+        return f"{self.id} - {self.tipo}"
 
 class Entidad(models.Model):
     NIT = models.CharField(max_length=50, primary_key=True, unique=True)

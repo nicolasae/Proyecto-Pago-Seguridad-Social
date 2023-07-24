@@ -19,7 +19,7 @@ class Gasto(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)
 
     def __str__(self):
-        return f"{self.id} - {self.tipo}"
+        return f"{self.tipo}"
 
 class Entidad(models.Model):
     NIT = models.CharField(max_length=50, primary_key=True, unique=True)
@@ -27,11 +27,11 @@ class Entidad(models.Model):
     concepto = models.CharField(max_length=100)
     razonEntidad = models.CharField(max_length=100)
     rubro = models.CharField(max_length=100)
-    tipoCuentaPagar = models.IntegerField()
-    codigo = models.IntegerField()
+    tipoCuentaPagar = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.NIT
+        return f"{self.concepto} - {self.NIT}"
     
 class Motivo(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)

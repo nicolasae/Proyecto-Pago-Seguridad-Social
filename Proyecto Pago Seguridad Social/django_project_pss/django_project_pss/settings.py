@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'entidad'
 ]
 
 MIDDLEWARE = [
@@ -86,8 +87,8 @@ DATABASES = {
         'NAME': 'bd_seguridad_social',
         'USER': 'root',
         'PASSWORD': '',
-        'HOST': 'localhost',  # Puedes cambiarlo al host de tu servidor MySQL si es diferente.
-        'PORT': '',          # Deja este campo en blanco para usar el puerto predeterminado (generalmente 3306).
+        'HOST': 'localhost',
+        'PORT': '',       
     }
 }
 

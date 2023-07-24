@@ -1,6 +1,8 @@
 import os
 
 from django.shortcuts import render
+from django.conf import settings
+
 from .models import Gasto, Entidad
 
 def lista_gastos(request):
@@ -13,7 +15,7 @@ def cargar_datos_entidades(request):
         
         # Nombre específico del archivo que deseas guardar
         nombre_nuevo_archivo = "datos entidades.xlsx"
-        ruta_guardado = os.path.join("C:\\Users\\naguie\\Desktop\\DSAJ\\Proyecto Pago Seguridad Social\\django_project_pss\\entidad\\static", nombre_nuevo_archivo)
+        ruta_guardado = os.path.join(settings.STATIC_ROOT, nombre_nuevo_archivo)
         print(ruta_guardado)
 
         # Procesa el archivo adjunto aquí

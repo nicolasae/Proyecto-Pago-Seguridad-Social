@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('cargar_datos_entidades/', views.load_data_entidades, name='cargar_datos_entidades'),
+    path('subir_entidades/', views.upload_data_entidades, name='subir_entidades'),
+    path('subir/', views.upload_documents, name='subir'),
 ]

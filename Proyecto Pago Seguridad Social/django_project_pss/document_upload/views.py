@@ -7,14 +7,24 @@ from django.conf import settings
 from .models import Patronal, Gasto, Entidad, Motivo
 
 # Create your views here.
-def save_uploaded_file(uploaded_file, new_file_name):
-    save_path = os.path.join(settings.MEDIA_ROOT, new_file_name)
+def create_folder_if_not_exists(folder_path):
+    # Check if the folder path exists
+    if not os.path.exists(folder_path):
+        try:
+            # Create the folder if it doesn't exist
+            os.makedirs(folder_path)
+            print(f"Folder '{folder_path}' created successfully.")
+        except OSError as e:
+            print(f"Error: Failed to create folder '{folder_path}'. Reason: {e}")
+    else:
+        print(f"Folder '{folder_path}' already exists.")
 
-    with open(save_path, 'wb') as destination:
+def save_uploaded_file(uploaded_file, path):
+    with open(path, 'wb') as destination:
         for chunk in uploaded_file.chunks():
             destination.write(chunk)
 
-    return save_path
+    return path
 
 def process_entidad_row(row):
     # Assuming the values are in the following order:
@@ -42,11 +52,12 @@ def process_entidad_row(row):
     )
     entidad.save()
 
-def load_data_entidades(request):
+def upload_data_entidades(request):
     if request.method == 'POST' and request.FILES.get('formFile'):
         upload_file = request.FILES['formFile']
         new_file_name = 'datos entidades.xlsx'
-        save_path = save_uploaded_file(upload_file, new_file_name)
+        path = os.path.join(settings.MEDIA_ROOT, new_file_name)
+        save_path = save_uploaded_file(upload_file, path)
 
         try:
             workbook = openpyxl.load_workbook(save_path)
@@ -66,3 +77,25 @@ def load_data_entidades(request):
             # return render(request, 'error.html')
 
     return render(request, 'load_data_entidades.html')
+
+def upload_documents( request ):
+    if request.method == 'POST':
+        # Acceder a los datos del formulario que se envían a través del método POST
+        selected_year = request.POST.get('selectYear')
+        selected_month = request.POST.get('selectMonth')
+
+        planilla = request.FILES.get('planilla')
+        patronalesTemporales = request.FILES.get('patronalesTemporales')
+        patronalesPermanentes = request.FILES.get('patronalesPermanentes')
+
+        planilla_new_name = 'Planilla Detallada' + selected_year + '-' + selected_month + '.xlsx' 
+
+        folder_path = os.path.join(settings.MEDIA_ROOT,'xlsx',selected_year,selected_month)
+        planilla_path = os.path.join(folder_path, planilla_new_name)
+
+        create_folder_if_not_exists(folder_path)
+        print(planilla_path)
+        save_uploaded_file(planilla,planilla_path)        
+
+    return render( request, 'load_documents.html')
+

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Subir documentos{% endblock %}
+
+{% block content %}
+
+{% include "navbar.html" %} 
+
+<div class="container">
+    
+    <h1>Subir documentos</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <section class="d-flex row">
+            <div class="col-6">
+                <label for="selectYear">Año:</label>
+                <select class="form-select" id="selectYear" name="selectYear"></select>
+            </div>
+
+            <div class="col-6">
+                <label for="selectMonth">Mes:</label>
+                <select class="form-select" id="selectMonth" name="selectMonth">
+                    <option value="01">Enero</option>
+                    <option value="02">Febrero</option>
+                    <option value="03">Marzo</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Mayo</option>
+                    <option value="06">Junio</option>
+                    <option value="07">Julio</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
+            </div>
+
+        </section>
+
+        <section class="row mt-4">
+            <!-- Documento Planilla -->
+            <div class="col-4 my-3">
+                <label for="planilla" class="form-label">Seleccione documento de planilla</label>
+                <input class="form-control" type="file" name="planilla" id="planilla">
+            </div>
+
+            <!-- Documento Patronales Permanentes -->
+            <div class="col-4 my-3">
+                <label for="patronalesPermanentes" class="form-label">Seleccione documento patronales permanentes</label>
+                <input class="form-control" type="file" name="patronalesPermanentes" id="patronalesPermanentes">
+            </div>
+
+            <!-- Documento Patronales Temporales -->
+            <div class="col-4 my-3">
+                <label for="patronalesTemporales" class="form-label">Seleccione documento patronales temporales</label>
+                <input class="form-control" type="file" name="patronalesTemporales" id="patronalesTemporales">
+            </div>
+        </section>
+
+        <button class="btn btn-outline-primary col-2 mt-3">
+            Subir documentos
+        </button>
+    </form>
+
+</div>
+
+
+<script>
+    // Obtener referencias a los elementos select
+    const selectYear = document.getElementById('selectYear');
+    const selectMonth = document.getElementById('selectMonth');
+
+    // Obtener el año actual
+    const currentYear = new Date().getFullYear();
+
+    // Rellenar el select de años con los últimos 10 años
+    for (let i = currentYear; i >= currentYear - 10; i--) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        selectYear.appendChild(option);
+    }
+
+    // Establecer el año actual como valor predeterminado
+    selectYear.value = currentYear;
+
+    // Escuchar eventos de cambio en el select de años
+    selectYear.addEventListener('change', updateSelectedDate);
+
+    // Escuchar eventos de cambio en el select de meses
+    selectMonth.addEventListener('change', updateSelectedDate);
+
+    // Función para actualizar la fecha seleccionada
+    function updateSelectedDate() {
+        const selectedYear = selectYear.value;
+        const selectedMonth = selectMonth.value;
+
+        // // Aquí puedes hacer lo que necesites con la fecha seleccionada
+        // console.log(`Año seleccionado: ${selectedYear}`);
+        // console.log(`Mes seleccionado: ${selectedMonth}`);
+    }
+</script>
+
+
+{% endblock %}

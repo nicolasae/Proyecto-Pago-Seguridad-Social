@@ -1,7 +1,8 @@
 import os
 import openpyxl
 
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render,redirect
 from django.conf import settings
 
 from .models import Patronal, Gasto, Entidad, Motivo
@@ -58,23 +59,37 @@ def upload_data_entidades(request):
         new_file_name = 'datos entidades.xlsx'
         path = os.path.join(settings.MEDIA_ROOT, new_file_name)
         save_path = save_uploaded_file(upload_file, path)
+        show_alert = False
 
         try:
             workbook = openpyxl.load_workbook(save_path)
             worksheet = workbook.active
             last_row = worksheet.max_row
 
+            context = {
+                'show_alert': True,
+                'alert_type':"success",
+                'message':'El archivo se ha procesado correctamente.',
+            }
+
             for row in worksheet.iter_rows(min_row=2, max_row=last_row, values_only=True):
                 process_entidad_row(row)
 
             # You can perform more operations or redirect to a success page here
-            # return render(request, 'archivo_cargado.html')
+            return render(request, 'load_data_entidades.html', context)
 
         except Exception as e:
+            context = {
+                'show_alert': True,
+                'alert_type':"danger",
+                'message':'Ocurrió un error al procesar el archivo.',
+            }
+
             # Error handling if something goes wrong while processing the file
             print(f"Error processing the file: {str(e)}")
+
             # You can add an error message in the response or redirect to an error page
-            # return render(request, 'error.html')
+            return render(request, 'load_data_entidades.html', context)
 
     return render(request, 'load_data_entidades.html')
 

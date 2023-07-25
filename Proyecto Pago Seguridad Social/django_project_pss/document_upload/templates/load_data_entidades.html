@@ -4,24 +4,32 @@
 
 {% block content %}
 
-{% include "navbar.html" %} 
+{% include "navbar.html" %}
 
 <div class="container mt-5">
     <h1>Datos entidades</h1>
 
+    {% if show_alert %}
+        <div class="alert alert-{{ alert_type }}" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="mb-3">
+        <div class="my-4">
             <label for="formFile" class="form-label">Seleccione Archivo</label>
             <input class="form-control" type="file" name="formFile" id="formFile">
         </div>
 
-        <button type="submit" class="btn btn-primary">Cargar</button>
-        <button class="btn btn-outline-primary">
-            <a href="/media/datos entidades.xlsx" download>
+        <div class="row justify-content-center">
+            <button type="submit" class="btn btn-outline-dark col-4 mx-5">Cargar</button>
+            <button class="btn btn-outline-secondary col-4 mx-5">
+                <!-- <a href="/media/datos entidades.xlsx" download> -->
                 Descargar información actual
-            </a>
-        </button>
+                <!-- </a> -->
+            </button>
+        </div>
     </form>
 
 </div>

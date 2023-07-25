@@ -84,18 +84,38 @@ def upload_documents( request ):
         selected_year = request.POST.get('selectYear')
         selected_month = request.POST.get('selectMonth')
 
-        planilla = request.FILES.get('planilla')
-        patronalesTemporales = request.FILES.get('patronalesTemporales')
-        patronalesPermanentes = request.FILES.get('patronalesPermanentes')
+        # Definir la lista de diccionarios para los archivos
+        filesDict = [
+            {
+                'nombreVariable': 'planilla',
+                'nombreFormulario': 'planilla',
+                'nuevoNombreArchivo': f'Planilla Detallada {selected_year}-{selected_month}.xlsx',
+            },
+            {
+                'nombreVariable': 'patronalesTemporales',
+                'nombreFormulario': 'patronalesTemporales',
+                'nuevoNombreArchivo': f'Patronales Temporales {selected_year}-{selected_month}.xlsx',
+            },
+            {
+                'nombreVariable': 'patronalesPermanentes',
+                'nombreFormulario': 'patronalesPermanentes',
+                'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
+            },
+        ]
 
-        planilla_new_name = 'Planilla Detallada' + selected_year + '-' + selected_month + '.xlsx' 
-
-        folder_path = os.path.join(settings.MEDIA_ROOT,'xlsx',selected_year,selected_month)
-        planilla_path = os.path.join(folder_path, planilla_new_name)
-
+        folder_path = os.path.join(settings.MEDIA_ROOT, 'xlsx', selected_year, selected_month)
         create_folder_if_not_exists(folder_path)
-        print(planilla_path)
-        save_uploaded_file(planilla,planilla_path)        
 
+        for file_info in filesDict:
+            nombre_variable = file_info['nombreVariable']
+            nombre_formulario = file_info['nombreFormulario']
+            nuevo_nombre_archivo = file_info['nuevoNombreArchivo']
+
+            archivo = request.FILES.get(nombre_formulario)
+            archivo_path = os.path.join(folder_path, nuevo_nombre_archivo)
+
+            print(archivo_path)
+            save_uploaded_file(archivo, archivo_path)
+    
     return render( request, 'load_documents.html')
 

@@ -1,10 +1,10 @@
-{% extends "entidad/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Datos entidades{% endblock %}
 
 {% block content %}
 
-    <h1>Cargar datos entidades</h1>
+    <h1>Datos entidades</h1>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -14,7 +14,15 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Cargar</button>
+
+        <button class="btn btn-outline-primary">
+            <a href="/static/datos entidades.xlsx" download>
+                Descargar información actual
+            </a>
+        </button>
     </form>
+
+
 
 {% endblock %}
       

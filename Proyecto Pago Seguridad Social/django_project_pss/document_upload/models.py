@@ -1,7 +1,5 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Patronal(models.Model):
@@ -39,10 +37,12 @@ class Entidad(models.Model):
 class Motivo(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     idPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
+    fecha = models.DateField(default=timezone.now)
     unidad2 = models.IntegerField()
     unidad8 = models.IntegerField()
     unidad9 = models.IntegerField()
     total = models.IntegerField()
+
 
     def __str__(self):
         return self.total

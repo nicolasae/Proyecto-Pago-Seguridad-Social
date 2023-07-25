@@ -43,7 +43,33 @@ class Motivo(models.Model):
     unidad9 = models.IntegerField()
     total = models.IntegerField()
 
-
     def __str__(self):
         return self.total
 
+class infoPlanilla(models.Model):
+    razonSocial = models.CharField(max_length=100)
+    codigoDependenciaSucursal = models.CharField(max_length=100)
+    fechaReporte = models.DateField()
+    fechaLimitePago = models.DateField()
+    periodoPension = models.DateField()
+    periodoSalud = models.DateField()
+    numeroPlanilla = models.CharField(max_length=100)
+    totalCotizantes = models.IntegerField()
+    PIN = models.CharField(max_length=100)
+    tipoPlanilla = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.numeroPlanilla
+    
+class valoresPlanilla(models.Model):
+    NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
+    idPlantilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
+    numeroAfiliados = models.IntegerField()
+    fondoSolidaridad = models.IntegerField()
+    fondoSubsistencia = models.IntegerField()
+    totalIntereses = models.IntegerField()
+    valorPagarSinIntereses = models.IntegerField()
+    valorPagar = models.IntegerField()
+
+    def __str__(self):
+        return  f"{self.idPlantilla} - {self.valorPagar}"

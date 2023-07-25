@@ -1,5 +1,6 @@
 import os
 import openpyxl
+import pandas as pd 
 
 from django.contrib import messages
 from django.shortcuts import render,redirect
@@ -133,4 +134,3 @@ def upload_documents( request ):
             save_uploaded_file(archivo, archivo_path)
     
     return render( request, 'load_documents.html')
-

@@ -1,7 +1,7 @@
 import os
 import csv
 
-from constants import csv_directory, xlsx_directory
+from constants import csv_directory
 
 def clean_empty_row_csv_files(csv_directory):
     # Get the list of files in the folder

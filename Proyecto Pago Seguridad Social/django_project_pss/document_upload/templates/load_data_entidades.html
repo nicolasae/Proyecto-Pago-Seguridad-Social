@@ -4,6 +4,11 @@
 
 {% block content %}
 
+{% load static %}
+
+{% include "navbar.html" %} 
+
+<div class="container mt-5">
     <h1>Datos entidades</h1>
 
     <form method="post" enctype="multipart/form-data">
@@ -14,15 +19,12 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Cargar</button>
-
         <button class="btn btn-outline-primary">
-            <a href="/static/datos entidades.xlsx" download>
+            <a href="/media/datos entidades.xlsx" download>
                 Descargar información actual
             </a>
         </button>
     </form>
 
-
-
+</div>
 {% endblock %}
-      

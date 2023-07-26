@@ -1,58 +1,12 @@
 import os
 import openpyxl
-import pandas as pd 
 
 from django.contrib import messages
 from django.shortcuts import render,redirect
 from django.conf import settings
 
-from .models import Patronal, Gasto, Entidad, Motivo
-
-# Create your views here.
-def create_folder_if_not_exists(folder_path):
-    # Check if the folder path exists
-    if not os.path.exists(folder_path):
-        try:
-            # Create the folder if it doesn't exist
-            os.makedirs(folder_path)
-            print(f"Folder '{folder_path}' created successfully.")
-        except OSError as e:
-            print(f"Error: Failed to create folder '{folder_path}'. Reason: {e}")
-    else:
-        print(f"Folder '{folder_path}' already exists.")
-
-def save_uploaded_file(uploaded_file, path):
-    with open(path, 'wb') as destination:
-        for chunk in uploaded_file.chunks():
-            destination.write(chunk)
-
-    return path
-
-def process_entidad_row(row):
-    # Assuming the values are in the following order:
-    # NIT, idTipoGasto (foreign keys), concepto, razonEntidad, rubro, tipoCuentaPagar, codigo
-
-    # Get the Gasto instance that matches the value of idTipoGasto in the xlsx file
-    try:
-        gasto_instance = Gasto.objects.get(tipo=row[1])
-    except Gasto.DoesNotExist:
-        print(f"Error: No Gasto instance found with type '{row[1]}'")
-        return
-    except IndexError:
-        print("Error: Column 'idTipoGasto' not found in the file")
-        return
-
-    # Create an Entidad instance and save it to the database
-    entidad = Entidad(
-        NIT=row[0],
-        idTipoGasto=gasto_instance,
-        concepto=row[2],
-        razonEntidad=row[3],
-        rubro=row[4],
-        tipoCuentaPagar=row[5],
-        codigo=row[6]
-    )
-    entidad.save()
+from .upload_files import *
+from .process_data import *
 
 def upload_data_entidades(request):
     if request.method == 'POST' and request.FILES.get('formFile'):
@@ -154,14 +108,3 @@ def upload_documents( request ):
             converter_xlsx_to_csv(path_file_xlsx,path_file_csv)
     
     return render( request, 'load_documents.html')
-
-def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
-    try:
-        # Cargar el archivo XLSX usando pandas
-        dataframe = pd.read_excel(folder_path_xlsx)
-
-        # Guardar el dataframe como archivo CSV
-        dataframe.to_csv(folder_path_csv, index=False)
-        print("Archivo convertido exitosamente a CSV.")
-    except Exception as e:
-        print("Error al convertir el archivo:", e)

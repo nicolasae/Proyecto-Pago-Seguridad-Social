@@ -117,6 +117,22 @@ def upload_documents( request ):
             #     'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
             #     'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
             # },
+            {
+                'nombreFormulario': 'deduc2',
+                'nuevoNombreArchivo': f'Deducibles Unidad 2 {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Deducibles Unidad 2 {selected_year}-{selected_month} converted.csv',
+            },
+            {
+                'nombreFormulario': 'deduc8',
+                'nuevoNombreArchivo': f'Deducibles Unidad 8 {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Deducibles Unidad 8 {selected_year}-{selected_month} converted.csv',
+            },
+            {
+                'nombreFormulario': 'deduc9',
+                'nuevoNombreArchivo': f'Deducibles Unidad 9 {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Deducibles Unidad 9 {selected_year}-{selected_month} converted.csv',
+            },
+
         ]
 
         folder_path_xlsx = os.path.join(settings.MEDIA_ROOT, 'xlsx', selected_year, selected_month)
@@ -138,7 +154,6 @@ def upload_documents( request ):
             converter_xlsx_to_csv(path_file_xlsx,path_file_csv)
     
     return render( request, 'load_documents.html')
-
 
 def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
     try:

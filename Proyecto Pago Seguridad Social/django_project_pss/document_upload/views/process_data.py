@@ -11,10 +11,33 @@ def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
 
         # Guardar el dataframe como archivo CSV
         dataframe.to_csv(folder_path_csv, index=False)
-        # print("Archivo convertido exitosamente a CSV.")
+        print("Archivo convertido exitosamente a CSV.")
     except Exception as e:
         print("Error al convertir el archivo:", e)
 
+def clean_empty_rows_csv( path_file ):
+    print(path_file)
+    #Get path without filename
+    dir_without_name = os.path.dirname(path_file)
+    temp_file_path = os.path.join(dir_without_name, "temporal.tmp")
+
+    # Open the input CSV file and the temporary output file
+    with open(path_file, 'r', encoding='utf-8', newline='') as input_file, \
+        open(temp_file_path, 'w', newline='') as output_file:
+                        
+        # Create a CSV reader and writer objects
+        csv_reader = csv.reader(input_file)
+        csv_writer = csv.writer(output_file)
+
+        # Loop through the rows in the input CSV
+        for row in csv_reader:
+            # Check if the row has any data (non-empty cells)
+            if any(field.strip() for field in row):
+                # Write the row to the temporary output file
+                csv_writer.writerow(row)
+
+    # Replace the original CSV file with the cleaned one
+    os.replace(temp_file_path, path_file)
 
 def process_entidad_row(row):
     # Assuming the values are in the following order:
@@ -42,25 +65,43 @@ def process_entidad_row(row):
     )
     entidad.save()
 
-def clean_empty_rows_csv( path_file ):
-    #Get path without filename
-    dir_without_name = os.path.dirname(path_file)
-    temp_file_path = os.path.join(dir_without_name, "temporal.tmp")
+# ---------------------------------------------------------------------
+# Procesos y manipulación de datos planilla
+def read_data_from_csv( csv_file_path ):
+    data = []
+    # Open CSV file in reading mode 
+    with open(csv_file_path, 'r', newline='') as archivo_csv:
+        lector_csv = csv.reader(archivo_csv)
+        
+        #Read data's file and save in data list
+        for fila in lector_csv:
+            data.append(fila)
+    
+    return data
 
-    # Open the input CSV file and the temporary output file
-    with open(path_file, 'r', encoding='utf-8', newline='') as input_file, \
-        open(temp_file_path, 'w', newline='') as output_file:
-                        
-        # Create a CSV reader and writer objects
-        csv_reader = csv.reader(input_file)
-        csv_writer = csv.writer(output_file)
+def find_index_of_row_by_partial_word(data, search_word):
+    for index, row in enumerate(data):
+        if search_word in row[0]:
+            return index
+    return None
 
-        # Loop through the rows in the input CSV
-        for row in csv_reader:
-            # Check if the row has any data (non-empty cells)
-            if any(field.strip() for field in row):
-                # Write the row to the temporary output file
-                csv_writer.writerow(row)
+def split_data_by_index_range(data, min_index, max_index):
+    return data[min_index:max_index + 1]
 
-    # Replace the original CSV file with the cleaned one
-    os.replace(temp_file_path, path_file)
+def planilla(csv_file_path):
+    data = read_data_from_csv(csv_file_path)
+    # Remove empty strings from the list of lists
+    cleaned_data = [[item for item in row if item.strip()] for row in data]
+
+    first_search_word = 'RAZON SOCIAL'
+    second_search_word = 'TIPO DE PLANILLA'
+
+    min_index = find_index_of_row_by_partial_word(cleaned_data, first_search_word)
+    max_index = find_index_of_row_by_partial_word(cleaned_data, second_search_word)
+
+    info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
+    valores_planilla_data = split_data_by_index_range(cleaned_data, max_index + 1,len(cleaned_data) -1 )
+    
+    # print(info_planilla_data)
+    print(valores_planilla_data)
+

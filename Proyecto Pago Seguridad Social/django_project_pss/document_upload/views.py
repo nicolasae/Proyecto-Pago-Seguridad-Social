@@ -103,34 +103,50 @@ def upload_documents( request ):
         # Definir la lista de diccionarios para los archivos
         filesDict = [
             {
-                'nombreVariable': 'planilla',
                 'nombreFormulario': 'planilla',
                 'nuevoNombreArchivo': f'Planilla Detallada {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
             },
-            {
-                'nombreVariable': 'patronalesTemporales',
-                'nombreFormulario': 'patronalesTemporales',
-                'nuevoNombreArchivo': f'Patronales Temporales {selected_year}-{selected_month}.xlsx',
-            },
-            {
-                'nombreVariable': 'patronalesPermanentes',
-                'nombreFormulario': 'patronalesPermanentes',
-                'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
-            },
+            # {
+            #     'nombreFormulario': 'patronalesTemporales',
+            #     'nuevoNombreArchivo': f'Patronales Temporales {selected_year}-{selected_month}.xlsx',
+            #     'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
+            # },
+            # {
+            #     'nombreFormulario': 'patronalesPermanentes',
+            #     'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
+            #     'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
+            # },
         ]
 
-        folder_path = os.path.join(settings.MEDIA_ROOT, 'xlsx', selected_year, selected_month)
-        create_folder_if_not_exists(folder_path)
+        folder_path_xlsx = os.path.join(settings.MEDIA_ROOT, 'xlsx', selected_year, selected_month)
+        folder_path_csv = os.path.join(settings.MEDIA_ROOT, 'csv', selected_year, selected_month)
+        
+        create_folder_if_not_exists(folder_path_xlsx)
+        create_folder_if_not_exists(folder_path_csv)
 
         for file_info in filesDict:
-            nombre_variable = file_info['nombreVariable']
-            nombre_formulario = file_info['nombreFormulario']
-            nuevo_nombre_archivo = file_info['nuevoNombreArchivo']
+            form_name = file_info['nombreFormulario']
+            new_filename = file_info['nuevoNombreArchivo']
+            new_filename_csv = file_info['nuevoNombreArchivoCSV']
+            
+            file = request.FILES.get(form_name)
+            path_file_xlsx = os.path.join(folder_path_xlsx, new_filename)
+            path_file_csv = os.path.join(folder_path_csv, new_filename_csv)
 
-            archivo = request.FILES.get(nombre_formulario)
-            archivo_path = os.path.join(folder_path, nuevo_nombre_archivo)
-
-            print(archivo_path)
-            save_uploaded_file(archivo, archivo_path)
+            save_uploaded_file(file, path_file_xlsx)
+            converter_xlsx_to_csv(path_file_xlsx,path_file_csv)
     
     return render( request, 'load_documents.html')
+
+
+def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
+    try:
+        # Cargar el archivo XLSX usando pandas
+        dataframe = pd.read_excel(folder_path_xlsx)
+
+        # Guardar el dataframe como archivo CSV
+        dataframe.to_csv(folder_path_csv, index=False)
+        print("Archivo convertido exitosamente a CSV.")
+    except Exception as e:
+        print("Error al convertir el archivo:", e)

@@ -47,7 +47,7 @@ class Motivo(models.Model):
         return self.total
 
 class infoPlanilla(models.Model):
-    razonSocial = models.CharField(max_length=100)
+    razonSocial = models.CharField(max_length=100, default="Rama Judicial")
     codigoDependenciaSucursal = models.CharField(max_length=100)
     fechaReporte = models.DateField()
     fechaLimitePago = models.DateField()

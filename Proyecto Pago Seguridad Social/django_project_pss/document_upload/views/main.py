@@ -106,6 +106,6 @@ def upload_documents( request ):
             save_uploaded_file(file, path_file_xlsx)
             converter_xlsx_to_csv(path_file_xlsx,path_file_csv)
             clean_empty_rows_csv(path_file_csv)
-            planilla(path_file_csv)
-    
+            extract_data_for_planilla(path_file_csv)
+            
     return render( request, 'load_documents.html')

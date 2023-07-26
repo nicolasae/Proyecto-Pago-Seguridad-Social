@@ -61,7 +61,7 @@ class infoPlanilla(models.Model):
     tipoPlanilla = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.numeroPlanilla
+        return f"{self.fechaReporte} - {self.numeroPlanilla}"
     
 class valoresPlanilla(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)

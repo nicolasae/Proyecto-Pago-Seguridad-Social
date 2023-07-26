@@ -1,8 +1,9 @@
 import os
 import pandas as pd 
 import csv
+from datetime import datetime
 
-from ..models import Patronal, Gasto, Entidad, Motivo
+from ..models import Patronal, Gasto, Entidad, Motivo, infoPlanilla
 
 def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
     try:
@@ -88,8 +89,9 @@ def find_index_of_row_by_partial_word(data, search_word):
 def split_data_by_index_range(data, min_index, max_index):
     return data[min_index:max_index + 1]
 
-def planilla(csv_file_path):
+def extract_data_for_planilla(csv_file_path):
     data = read_data_from_csv(csv_file_path)
+    
     # Remove empty strings from the list of lists
     cleaned_data = [[item for item in row if item.strip()] for row in data]
 
@@ -102,6 +104,30 @@ def planilla(csv_file_path):
     info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
     valores_planilla_data = split_data_by_index_range(cleaned_data, max_index + 1,len(cleaned_data) -1 )
     
-    # print(info_planilla_data)
-    print(valores_planilla_data)
+    save_db_info_planilla(info_planilla_data)
 
+def save_db_info_planilla(data):
+    perido_pension = data[6][1]  
+    perido_salud = data[7][1]  
+
+    # Convertir la cadena a un objeto datetime
+    periodo_pension_objeto = datetime.strptime(perido_pension + '-01', '%Y-%m-%d')
+    periodo_salud_objeto = datetime.strptime(perido_salud + '-01', '%Y-%m-%d')
+
+    planilla = infoPlanilla (
+        razonSocial = 'Rama Judicial',
+        identificacion = data[1][1],
+        codigoDependenciaSucursal = data[2][1],
+        nomDependenciaSucursal = data[3][1],
+        fechaReporte = data[4][1],
+        fechaLimitePago = data[5][1],
+        periodoPension = periodo_pension_objeto,
+        periodoSalud = periodo_salud_objeto,
+        numeroPlanilla = data[8][1],
+        totalCotizantes = data[9][1],
+        PIN = data[10][1],
+        tipoPlanilla = data[11][1],
+    ) 
+
+    planilla.save()
+    

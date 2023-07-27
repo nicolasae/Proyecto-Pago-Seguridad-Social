@@ -7,6 +7,8 @@ from django.conf import settings
 
 from .upload_files import *
 from .process_data import *
+from .process_data_planilla import *
+
 
 def upload_data_entidades(request):
     if request.method == 'POST' and request.FILES.get('formFile'):

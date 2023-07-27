@@ -20,16 +20,31 @@ def planilla_report_view(request):
             
 def create_report(year, month):
     # Obtener los objetos de infoPlanilla filtrados por año y mes
-    info_planillas = infoPlanilla.objects.filter(año=year, mes=month)
+    info_planilla = infoPlanilla.objects.filter(año=year, mes=month)
     filename = f'Planilla_Detallada_{year}_{month}.xlsx'
-
 
     # Crea un libro de trabajo de Excel
     workbook = openpyxl.Workbook()
 
-    # Crea una hoja en el libro de trabajo
-    worksheet = workbook.active
+    # Crea la hoja "Informacion General"
+    info_general_worksheet = workbook.active
+    info_general_worksheet.title = f'Informacion General Planilla'  
+    valores_worksheet = workbook.create_sheet(title='Valores Planilla')
+  
+    create_info_sheet_planilla(info_general_worksheet,info_planilla)
+    # create_values_sheet_planilla(valores_worksheet,)
 
+    # Guarda el archivo Excel en un objeto de tipo HttpResponse
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename={}'.format(escape_uri_path(filename))
+
+    # Guarda el contenido del libro de trabajo en el objeto de respuesta
+    workbook.save(response)
+
+    return response
+
+
+def create_info_sheet_planilla(worksheet, info_planilla):
     # Mapeo de campos del modelo con los encabezados en el archivo Excel
     field_mapping = {
         'razonSocial': 'RAZON SOCIAL',
@@ -51,18 +66,12 @@ def create_report(year, month):
         worksheet.cell(row=row_num, column=1, value=header)
 
     row_num = 1
-    for obj in info_planillas:
+    for obj in info_planilla:
         for key in field_mapping:
             attribute_name = key  # Get the attribute name from the field_mapping
             value = getattr(obj, attribute_name, '')  # Get the attribute value using getattr
             worksheet.cell(row = row_num, column = 2, value = value)
             row_num += 1
 
-    # Guarda el archivo Excel en un objeto de tipo HttpResponse
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename={}'.format(escape_uri_path(filename))
-
-    # Guarda el contenido del libro de trabajo en el objeto de respuesta
-    workbook.save(response)
-
-    return response
+# def create_values_sheet_planilla(worksheet, values_planilla):
+#     print(values_planilla)

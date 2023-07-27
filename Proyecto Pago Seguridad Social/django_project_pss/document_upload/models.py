@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+import datetime
+
 
 # Create your models here.
 class Patronal(models.Model):
@@ -49,19 +51,21 @@ class Motivo(models.Model):
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)
     razonSocial = models.CharField(max_length=100, default="Rama Judicial")
+    año = models.CharField(max_length=4)
+    mes = models.CharField(max_length=2)
     identificacion = models.CharField(max_length=100)
     codigoDependenciaSucursal = models.CharField(max_length=100)
     nomDependenciaSucursal = models.CharField(max_length=100)
     fechaReporte = models.DateField()
     fechaLimitePago = models.DateField()
-    periodoPension = models.DateField()
-    periodoSalud = models.DateField()
+    periodoPension = models.CharField(max_length=7)
+    periodoSalud = models.CharField(max_length=7)
     totalCotizantes = models.IntegerField()
     PIN = models.CharField(max_length=100)
     tipoPlanilla = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"Fecha reporte: {self.fechaReporte} - Número planilla: {self.numeroPlanilla}"
+        return f"Fecha reporte: {self.año}/{self.mes} - Número planilla: {self.numeroPlanilla}"
     
 class valoresPlanilla(models.Model):
     codigoEntidad = models.CharField(max_length=100)

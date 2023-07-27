@@ -3,7 +3,7 @@ import pandas as pd
 import csv
 from datetime import datetime
 
-from ..models import Patronal, Gasto, Entidad, Motivo, infoPlanilla
+from ..models import Patronal, Gasto, Entidad, Motivo, infoPlanilla, valoresPlanilla
 
 def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
     try:
@@ -102,9 +102,10 @@ def extract_data_for_planilla(csv_file_path):
     max_index = find_index_of_row_by_partial_word(cleaned_data, second_search_word)
 
     info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
-    valores_planilla_data = split_data_by_index_range(cleaned_data, max_index + 1,len(cleaned_data) -1 )
+    values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 1,len(cleaned_data) -1 )
     
     save_db_info_planilla(info_planilla_data)
+    save_db_values_planilla(info_planilla_data,values_planilla_data)
 
 def save_db_info_planilla(data):
     perido_pension = data[6][1]  
@@ -131,3 +132,23 @@ def save_db_info_planilla(data):
 
     planilla.save()
     
+def save_db_values_planilla(info_planilla_data, values_planilla_data):
+    numeroPlanilla = info_planilla_data[8][1]
+
+    for array in values_planilla_data[1:]:
+        if len(array) >= 9:
+            codigoEntidad = array[0]         
+
+            values_planilla = valoresPlanilla(
+                codigoEntidad = codigoEntidad,
+                NIT = Entidad.objects.get(NIT=array[1]),
+                numeroPlanilla = infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla),
+                numeroAfiliados = array[3],
+                fondoSolidaridad = array[4],
+                fondoSubsistencia = array[5],
+                totalIntereses = array[6],
+                valorPagarSinIntereses = array[7],
+                valorPagar = array[8], 
+            )
+
+            values_planilla.save()

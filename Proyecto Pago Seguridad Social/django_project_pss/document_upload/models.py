@@ -10,7 +10,7 @@ class Patronal(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)
 
     def __str__(self):
-        return self.tipo
+        return f"Tipo: {self.tipo}"
     
 class Gasto(models.Model):
     TIPO_CHOICES = (
@@ -20,7 +20,7 @@ class Gasto(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)
 
     def __str__(self):
-        return f"{self.tipo}"
+        return f"Tipo: {self.tipo}"
 
 class Entidad(models.Model):
     NIT = models.CharField(max_length=50, primary_key=True, unique=True)
@@ -32,7 +32,7 @@ class Entidad(models.Model):
     codigo = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.concepto} - {self.NIT}"
+        return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad}"
     
 class Motivo(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
@@ -47,6 +47,7 @@ class Motivo(models.Model):
         return self.total
 
 class infoPlanilla(models.Model):
+    numeroPlanilla = models.CharField(max_length=100, primary_key=True)
     razonSocial = models.CharField(max_length=100, default="Rama Judicial")
     identificacion = models.CharField(max_length=100)
     codigoDependenciaSucursal = models.CharField(max_length=100)
@@ -55,17 +56,17 @@ class infoPlanilla(models.Model):
     fechaLimitePago = models.DateField()
     periodoPension = models.DateField()
     periodoSalud = models.DateField()
-    numeroPlanilla = models.CharField(max_length=100)
     totalCotizantes = models.IntegerField()
     PIN = models.CharField(max_length=100)
     tipoPlanilla = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.fechaReporte} - {self.numeroPlanilla}"
+        return f"Fecha reporte: {self.fechaReporte} - Número planilla: {self.numeroPlanilla}"
     
 class valoresPlanilla(models.Model):
+    codigoEntidad = models.CharField(max_length=100)
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
-    idPlantilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
+    numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
     numeroAfiliados = models.IntegerField()
     fondoSolidaridad = models.IntegerField()
     fondoSubsistencia = models.IntegerField()
@@ -73,5 +74,9 @@ class valoresPlanilla(models.Model):
     valorPagarSinIntereses = models.IntegerField()
     valorPagar = models.IntegerField()
 
+    class Meta:
+        # Definir la combinación de campos que debe ser única
+        unique_together = ('numeroPlanilla', 'codigoEntidad',)
+
     def __str__(self):
-        return  f"{self.idPlantilla} - {self.valorPagar}"
+        return  f"{self.numeroPlanilla} - {self.NIT} - Valor a Pagar: {self.valorPagar}"

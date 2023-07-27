@@ -105,7 +105,7 @@ def extract_data_for_planilla(csv_file_path,year,month):
     values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 1,len(cleaned_data) -1 )
     
     save_db_info_planilla(info_planilla_data,year,month)
-    # save_db_values_planilla(info_planilla_data,values_planilla_data)
+    save_db_values_planilla(info_planilla_data,values_planilla_data)
 
 def save_db_info_planilla(data,year=None,month=None):
     if not year:
@@ -116,12 +116,6 @@ def save_db_info_planilla(data,year=None,month=None):
 
     perido_pension = data[6][1]  
     perido_salud = data[7][1] 
-    print(perido_pension) 
-    print(perido_salud)
-
-    # Convertir la cadena a un objeto datetime
-    # periodo_pension_objeto = datetime.strptime(perido_pension + '-01', '%Y-%m-%d')
-    # periodo_salud_objeto = datetime.strptime(perido_salud + '-01', '%Y-%m-%d')
 
     planilla = infoPlanilla (
         razonSocial = 'Rama Judicial',
@@ -132,8 +126,8 @@ def save_db_info_planilla(data,year=None,month=None):
         nomDependenciaSucursal = data[3][1],
         fechaReporte = data[4][1],
         fechaLimitePago = data[5][1],
-        periodoPension = '2023-11-11',
-        periodoSalud = '2023-11-11',
+        periodoPension = perido_pension,
+        periodoSalud = perido_salud,
         numeroPlanilla = data[8][1],
         totalCotizantes = data[9][1],
         PIN = data[10][1],

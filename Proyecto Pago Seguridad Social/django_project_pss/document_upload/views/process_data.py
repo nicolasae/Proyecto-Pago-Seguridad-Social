@@ -137,18 +137,36 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
 
     for array in values_planilla_data[1:]:
         if len(array) >= 9:
-            codigoEntidad = array[0]         
+            codigoEntidad = array[0]
 
-            values_planilla = valoresPlanilla(
-                codigoEntidad = codigoEntidad,
-                NIT = Entidad.objects.get(NIT=array[1]),
-                numeroPlanilla = infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla),
-                numeroAfiliados = array[3],
-                fondoSolidaridad = array[4],
-                fondoSubsistencia = array[5],
-                totalIntereses = array[6],
-                valorPagarSinIntereses = array[7],
-                valorPagar = array[8], 
-            )
+            # Verificar si el registro ya existe
+            try:
+                values_planilla = valoresPlanilla.objects.get(
+                    codigoEntidad=codigoEntidad,
+                    numeroPlanilla__numeroPlanilla=numeroPlanilla
+                )
+            except valoresPlanilla.DoesNotExist:
+                # Si no existe, crear uno nuevo
+                values_planilla = valoresPlanilla(
+                    codigoEntidad=codigoEntidad,
+                    NIT=Entidad.objects.get(NIT=array[1]),
+                    numeroPlanilla=infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla),
+                    numeroAfiliados=array[3],
+                    fondoSolidaridad=array[4],
+                    fondoSubsistencia=array[5],
+                    totalIntereses=array[6],
+                    valorPagarSinIntereses=array[7],
+                    valorPagar=array[8], 
+                )
+            else:
+                # Si existe, actualizar los valores
+                values_planilla.NIT = Entidad.objects.get(NIT=array[1])
+                values_planilla.numeroAfiliados = array[3]
+                values_planilla.fondoSolidaridad = array[4]
+                values_planilla.fondoSubsistencia = array[5]
+                values_planilla.totalIntereses = array[6]
+                values_planilla.valorPagarSinIntereses = array[7]
+                values_planilla.valorPagar = array[8]
 
+            # Guardar el registro
             values_planilla.save()

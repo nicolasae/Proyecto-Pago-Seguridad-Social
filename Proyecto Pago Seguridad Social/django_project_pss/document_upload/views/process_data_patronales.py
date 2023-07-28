@@ -38,20 +38,19 @@ def save_data_patronales_temporales(data,year=None,month=None):
         
         total_unidades = int(item[2]) + int(item[3]) + int(item[4])
         periodo = year + '/' + month
-        print(total_unidades)
-        # # Create an Motivo instance and save it to the database
-        motivo = Motivo(
-            NIT = entidad_instance,
-            tipoPatronal = patronal_instace,
-            fecha = periodo,
-            unidad2 = int(item[2]),
-            unidad8 = int(item[3]),
-            unidad9 = int(item[4]),
-            total = total_unidades,
+        
+        # Use get_or_create instead of create to ensure uniqueness
+        motivo, created = Motivo.objects.get_or_create(
+            NIT=entidad_instance,
+            tipoPatronal=patronal_instace,
+            fecha=periodo,
+            defaults={
+                'unidad2': int(item[2]),
+                'unidad8': int(item[3]),
+                'unidad9': int(item[4]),
+                'total': total_unidades,
+            }
         )
-
-        motivo.save()
-
 
     
    

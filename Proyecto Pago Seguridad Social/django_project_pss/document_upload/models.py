@@ -1,7 +1,5 @@
 from django.db import models
 from django.utils import timezone
-import datetime
-
 
 # Create your models here.
 class Patronal(models.Model):
@@ -39,14 +37,18 @@ class Entidad(models.Model):
 class Motivo(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     tipoPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
-    fecha = models.DateField(default=timezone.now)
+    fecha = models.CharField(max_length=10)
     unidad2 = models.IntegerField()
     unidad8 = models.IntegerField()
     unidad9 = models.IntegerField()
     total = models.IntegerField()
 
+    class Meta:
+        # Definir la combinación de campos que debe ser única
+        unique_together = ('NIT', 'tipoPatronal', 'fecha',)
+
     def __str__(self):
-        return f"{self.NIT} - {self.tipoPatronal} - Total: {self.total}"
+        return f"Fecha:{self.fecha} {self.NIT} - {self.tipoPatronal} - Total: {self.total}"
 
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)

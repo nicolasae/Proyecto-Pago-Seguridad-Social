@@ -57,8 +57,8 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
             # Verificar si el registro ya existe
             try:
                 values_planilla = valoresPlanilla.objects.get(
-                    codigoEntidad=codigoEntidad,
-                    numeroPlanilla__numeroPlanilla=numeroPlanilla
+                    codigoEntidad = codigoEntidad,
+                    numeroPlanilla__numeroPlanilla = numeroPlanilla
                 )
             except valoresPlanilla.DoesNotExist:
                 # Si no existe, crear uno nuevo

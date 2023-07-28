@@ -8,6 +8,7 @@ from django.conf import settings
 from .upload_files import *
 from .process_data import *
 from .process_data_planilla import *
+from .process_data_patronales import * 
 
 
 def upload_data_entidades(request):
@@ -58,16 +59,16 @@ def upload_documents( request ):
 
         # Definir la lista de diccionarios para los archivos
         filesDict = [
-            {
-                'nombreFormulario': 'planilla',
-                'nuevoNombreArchivo': f'Planilla Detallada {selected_year}-{selected_month}.xlsx',
-                'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
-            },
             # {
-            #     'nombreFormulario': 'patronalesTemporales',
-            #     'nuevoNombreArchivo': f'Patronales Temporales {selected_year}-{selected_month}.xlsx',
-            #     'nuevoNombreArchivoCSV': f'Patronales Temporales {selected_year}-{selected_month} converted.csv',
+            #     'nombreFormulario': 'planilla',
+            #     'nuevoNombreArchivo': f'Planilla Detallada {selected_year}-{selected_month}.xlsx',
+            #     'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
             # },
+            {
+                'nombreFormulario': 'patronalesTemporales',
+                'nuevoNombreArchivo': f'Patronales Temporales {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Patronales Temporales {selected_year}-{selected_month} converted.csv',
+            },
             # {
             #     'nombreFormulario': 'patronalesPermanentes',
             #     'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
@@ -108,6 +109,13 @@ def upload_documents( request ):
             save_uploaded_file(file, path_file_xlsx)
             converter_xlsx_to_csv(path_file_xlsx,path_file_csv)
             clean_empty_rows_csv(path_file_csv)
-            extract_data_for_planilla(path_file_csv,selected_year,selected_month)
-            
+            # Guardar informacion de Planilla
+            if ( form_name == 'planilla'):
+                print('entro a planilla')
+                # extract_data_for_planilla(path_file_csv,selected_year,selected_month)
+            if ( form_name == 'patronalesTemporales'):
+                print('entro a temporales')
+                extract_data_patronales_temporales(path_file_csv,selected_year,selected_month)
+                
+                        
     return render( request, 'load_documents.html')

@@ -1,6 +1,8 @@
 import os
 import pandas as pd 
 import csv
+import shutil
+
 from datetime import datetime
 
 from ..models import *
@@ -129,3 +131,22 @@ def delete_columns_by_words(file_path, words_to_delete):
     # Delete the corresponding columns from the CSV file
     for index_col in sorted(columns_to_delete, reverse=True):
         delete_column_by_index(file_path, index_col)
+
+def delete_rows_by_words(file_path, words_to_delete):
+    # Create a temporary file to write the updated content
+    temp_file_path = file_path + '.temp'
+    with open(temp_file_path, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file)
+        with open(file_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                should_delete = False
+                for word in words_to_delete:
+                    if any(word in cell for cell in row):
+                        should_delete = True
+                        break
+                if not should_delete:
+                    writer.writerow(row)
+
+    # Replace the original file with the updated content from the temporary file
+    shutil.move(temp_file_path, file_path)

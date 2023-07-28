@@ -38,7 +38,7 @@ class Entidad(models.Model):
     
 class Motivo(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
-    idPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
+    tipoPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
     fecha = models.DateField(default=timezone.now)
     unidad2 = models.IntegerField()
     unidad8 = models.IntegerField()
@@ -46,13 +46,12 @@ class Motivo(models.Model):
     total = models.IntegerField()
 
     def __str__(self):
-        return self.total
+        return f"{self.NIT} - {self.tipoPatronal} - Total: {self.total}"
 
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)
     razonSocial = models.CharField(max_length=100, default="Rama Judicial")
-    año = models.CharField(max_length=4)
-    mes = models.CharField(max_length=2)
+    periodo = models.CharField(max_length=10,default='2023/06')
     identificacion = models.CharField(max_length=100)
     codigoDependenciaSucursal = models.CharField(max_length=100)
     nomDependenciaSucursal = models.CharField(max_length=100)
@@ -65,7 +64,7 @@ class infoPlanilla(models.Model):
     tipoPlanilla = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"Fecha reporte: {self.año}/{self.mes} - Número planilla: {self.numeroPlanilla}"
+        return f"Fecha reporte: {self.periodo} - Número planilla: {self.numeroPlanilla}"
     
 class valoresPlanilla(models.Model):
     codigoEntidad = models.CharField(max_length=100)

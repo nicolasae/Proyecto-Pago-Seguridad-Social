@@ -20,19 +20,14 @@ def extract_data_for_planilla(csv_file_path,year,month):
     save_db_values_planilla(info_planilla_data,values_planilla_data)
 
 def save_db_info_planilla(data,year=None,month=None):
-    if not year:
-        year = str(datetime.date.today().year)
-
-    if not month:
-        month = str(datetime.date.today().month).zfill(2)
+    periodo = year + '/' + month
 
     perido_pension = data[6][1]  
     perido_salud = data[7][1] 
 
     planilla = infoPlanilla (
         razonSocial = 'Rama Judicial',
-        año = year,
-        mes = month,
+        periodo = periodo,
         identificacion = data[1][1],
         codigoDependenciaSucursal = data[2][1],
         nomDependenciaSucursal = data[3][1],

@@ -150,3 +150,17 @@ def delete_rows_by_words(file_path, words_to_delete):
 
     # Replace the original file with the updated content from the temporary file
     shutil.move(temp_file_path, file_path)
+
+def keep_rows_with_six_columns(file_path):
+    # Create a temporary file to write the updated content
+    temp_file_path = file_path + '.temp'
+    with open(temp_file_path, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file)
+        with open(file_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if sum(1 for cell in row if cell.strip()) == 6:
+                    writer.writerow(row)
+
+    # Replace the original file with the updated content from the temporary file
+    shutil.move(temp_file_path, file_path)

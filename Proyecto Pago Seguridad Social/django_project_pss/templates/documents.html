@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Documentos{% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+    <section class="row-cabecera">
+        {% include "navbar.html" %} 
+    </section>
+
+    <main class="cuerpo-contenido">       
+        <div class="row justify-content-center">
+            <div class="col-md-6 mt-5">
+                <div class="card">
+                    <div class="image-container">
+                        <img src="{% static 'images/logo_rama_judicial.png' %}" class="card-img-top" alt="Logo Rama Judicial">
+                    </div>
+                    <div class="card-body text-center mt-5">
+                        <h1>Documentos</h1>
+                        <div class="d-flex justify-content-center">
+                            <a href="/documentos/subir">
+                                <button type="button" class="btn-outline-local">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                    Subir información
+                                </button>
+                            </a>
+
+                            <a href="/documentos/subir_entidades">
+                                <button type="button" class="btn-outline-local">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                    Subir información entidades
+                                </button>
+                            </a>
+
+                            <a href="#">
+                                <button type="button" class="btn-outline-local">
+                                    <i class="bi bi-cloud-arrow-down"></i>
+                                    Descargar Plantillas 
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

@@ -4,9 +4,11 @@
 
 {% block content %}
 
-{% include "navbar.html" %} 
+<section class="row-cabecera">
+    {% include "navbar.html" %} 
+</section>
 
-<div class="container my-5">
+<main class="cuerpo-contenido">
     
     <h1>Subir documentos</h1>
     <form method="post" enctype="multipart/form-data">
@@ -80,7 +82,7 @@
         </button>
     </form>
 
-</div>
+</main>
 
 <script>
     // Obtener referencias a los elementos select

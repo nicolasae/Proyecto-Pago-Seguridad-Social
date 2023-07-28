@@ -9,8 +9,9 @@ from .views import *
 urlpatterns = [
     path('', render_home_page, name = 'pagina_inicio'),
     path('admin/', admin.site.urls),
+    path('documentos/', render_documents_page, name = 'documentos'),
     path('documentos/', include('document_upload.urls')),
-    path('informes/', include('report_generation.urls')),
+    path('documentos/', include('report_generation.urls')),
 ]
 
 

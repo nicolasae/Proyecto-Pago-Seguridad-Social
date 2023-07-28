@@ -1,0 +1,75 @@
+:root {
+    --azul_institucional:#004278;
+    --gris: #808080;
+    --blanco:#FFFFFF;
+    --verde_oscuro :#0074D9;
+    --amarillo_dorado :#FFD700;
+}
+
+.titulo {
+    color: var(--azul_institucional);
+}
+
+.navbar {
+    background-color: var(--azul_institucional);
+}
+
+.cuerpo-contenido {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 5px;
+}
+.cuerpo-contenido a {
+    text-decoration: none;
+}
+
+a.nav-link {
+    color: white;
+}
+
+.nav-link:hover {
+    color: white;
+    text-decoration: underline;
+} 
+
+.image-container {
+    max-width: 300px;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+.card {
+    border: none !important;
+}
+
+.btn-local {
+    background: var(--azul_institucional);
+    border: 0;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+    font-weight: bolder;
+    margin: 0 10px;
+}
+
+.btn-outline-local {
+    background:var(--blanco);
+    border: 1px solid var(--azul_institucional);
+    border-radius: 5px;
+    padding: 10px;
+    color: var(--azul_institucional);
+    font-weight: bolder;
+    margin: 0 10px;
+}
+
+.btn-outline-local:hover{
+    background-color: var(--azul_institucional);
+    color: var(--blanco);
+}
+
+
+@media (min-width: 1400px) {
+    .cuerpo-contenido {
+        padding: 0 30px;
+    }
+}

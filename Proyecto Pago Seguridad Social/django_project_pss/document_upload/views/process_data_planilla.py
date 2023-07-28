@@ -80,4 +80,3 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
 
             # Guardar el registro
             values_planilla.save()
-

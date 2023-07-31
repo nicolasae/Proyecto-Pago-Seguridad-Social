@@ -75,7 +75,7 @@ class valoresPlanilla(models.Model):
     numeroAfiliados = models.IntegerField()
     fondoSolidaridad = models.IntegerField()
     fondoSubsistencia = models.IntegerField()
-    totalIntereses = models.IntegerField()
+    totalIntereses = models.IntegerField(default=0)
     valorPagarSinIntereses = models.IntegerField()
     valorPagar = models.IntegerField()
 

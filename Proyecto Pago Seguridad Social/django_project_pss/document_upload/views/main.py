@@ -60,21 +60,21 @@ def upload_documents( request ):
 
         # Definir la lista de diccionarios para los archivos
         filesDict = [
-            # {
-            #     'nombreFormulario': 'planilla',
-            #     'nuevoNombreArchivo': f'Planilla Detallada {selected_year}-{selected_month}.xlsx',
-            #     'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
-            # },
+            {
+                'nombreFormulario': 'planilla',
+                'nuevoNombreArchivo': f'Planilla Detallada {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Planilla Detallada {selected_year}-{selected_month} converted.csv',
+            },
             {
                 'nombreFormulario': 'patronalesTemporales',
                 'nuevoNombreArchivo': f'Patronales Temporales {selected_year}-{selected_month}.xlsx',
                 'nuevoNombreArchivoCSV': f'Patronales Temporales {selected_year}-{selected_month} converted.csv',
             },
-            # {
-            #     'nombreFormulario': 'patronalesPermanentes',
-            #     'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
-            #     'nuevoNombreArchivoCSV': f'Patronales Permanentes {selected_year}-{selected_month} converted.csv',
-            # },
+            {
+                'nombreFormulario': 'patronalesPermanentes',
+                'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Patronales Permanentes {selected_year}-{selected_month} converted.csv',
+            },
             # {
             #     'nombreFormulario': 'deduc2',
             #     'nuevoNombreArchivo': f'Deducibles Unidad 2 {selected_year}-{selected_month}.xlsx',
@@ -113,10 +113,13 @@ def upload_documents( request ):
             # Guardar informacion de Planilla
             if ( form_name == 'planilla'):
                 print('entro a planilla')
-                # extract_data_for_planilla(path_file_csv,selected_year,selected_month)
-            if ( form_name == 'patronalesTemporales'):
+                extract_data_for_planilla(path_file_csv,selected_year,selected_month)
+            if ( form_name == 'patronalesTemporales' ):
                 print('entro a temporales')
                 extract_data_patronales_temporales(path_file_csv,selected_year,selected_month)
+            if ( form_name == 'patronalesPermanentes' ):
+                print('entro a permanentes')
+                extract_data_patronales_permanentes(path_file_csv,selected_year,selected_month)
                 
                         
     return render( request, 'load_documents.html')

@@ -48,7 +48,7 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
     for array in values_planilla_data[1:]:
         if len(array) >= 9:
             codigoEntidad = array[0]
-
+            valor_total = array[6] + array[7]
             # Verificar si el registro ya existe
             try:
                 values_planilla = valoresPlanilla.objects.get(
@@ -66,7 +66,7 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
                     fondoSubsistencia=array[5],
                     totalIntereses=array[6],
                     valorPagarSinIntereses=array[7],
-                    valorPagar=array[8], 
+                    valorPagar=valor_total, 
                 )
             else:
                 # Si existe, actualizar los valores
@@ -76,7 +76,7 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
                 values_planilla.fondoSubsistencia = array[5]
                 values_planilla.totalIntereses = array[6]
                 values_planilla.valorPagarSinIntereses = array[7]
-                values_planilla.valorPagar = array[8]
+                values_planilla.valorPagar = valor_total
 
             # Guardar el registro
             values_planilla.save()

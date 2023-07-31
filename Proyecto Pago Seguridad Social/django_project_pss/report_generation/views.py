@@ -15,14 +15,11 @@ def download_view(request):
             # Acción para generar el resumen de la planilla
             return create_report_planilla(selected_year,selected_month)
         
-        if 'btn_resumen_patronales_temporales' in request.POST:
-            # Aquí puedes realizar la acción para generar el resumen de las patronales temporales
-            print("Botón Resumen Patronales Temporales presionado")
-        
-        if 'btn_resumen_patronales_permanentes' in request.POST:
-            # Aquí puedes realizar la acción para generar el resumen de las patronales permanentes
-            print("Botón Resumen Patronales Permanentes presionado")    
-
+        if 'btn_resumen_patronales' in request.POST:
+            # Aquí puedes realizar la acción para generar el resumen de las patronales           
+            print("Botón Resumen Patronales  presionado")
+            # return create_report_patronales(selected_year, selected_month)
+            create_report_patronales(selected_year, selected_month)
            
     return redirect('reportes')
 
@@ -146,3 +143,26 @@ def write_values_planilla_data(sheet, values_planilla):
         sheet.cell(row=row_num, column=1, value=item['campo1'])
         sheet.cell(row=row_num, column=2, value=item['campo2'])
         row_num += 1
+
+
+def create_report_patronales(year, month):
+    date = year + '/' + month
+    data_temporales = get_data_temporales(date)
+    print(data_temporales)
+    # data_permanentes = get_data_permanentes(date)
+    # return generate_excel_report(data_temporales,data_permanentes, year, month)
+
+def get_data_temporales(date):
+    # Filtrar por tipoPatronal permanente y fecha
+    resultados = Motivo.objects.filter(tipoPatronal__tipo='temporal', fecha=date)
+
+    # Mostrar los resultados
+    for motivo in resultados:
+        print(motivo)
+
+    return resultados
+
+def get_data_permanentes(date):
+    # Obtener los objetos de infoPlanilla filtrados por año y mes
+    info_planilla = infoPlanilla.objects.filter(periodo=date)
+    return info_planilla

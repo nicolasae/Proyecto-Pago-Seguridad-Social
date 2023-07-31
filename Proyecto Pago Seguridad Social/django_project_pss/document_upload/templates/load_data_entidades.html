@@ -22,14 +22,22 @@
             <input class="form-control" type="file" name="formFile" id="formFile">
         </div>
 
-        <section class="row justify-content-center">
-            <button type="submit" class="btn btn-outline-dark col-4 mx-5">Cargar</button>
-            <button class="btn btn-outline-secondary col-4 mx-5">
-                <!-- <a href="/media/datos entidades.xlsx" download> -->
-                Descargar información actual
-                <!-- </a> -->
+        <section class="d-flex justify-content-center">
+            <button type="submit" class="btn-outline-local">
+                Cargar Información
             </button>
+            <a href="/media/datos_entidades.xlsx" download>
+                <button type="button" class="btn-outline-local">
+                    Descargar Información Actual
+                </button>
+            </a>
+            <a href="/documentos/listar/entidades">
+                <button type="button" class="btn-outline-local">
+                    Listar Entidades
+                </button>
+            </a>
         </section>
+
     </form>
 
 </div>

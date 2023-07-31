@@ -1,6 +1,14 @@
+{% load static %}
+
 <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">Inicio</a>
+        <div class="">
+          <a class="enlace" href="/">
+            Inicio
+            <!-- <img src="{% static 'images/logo_rama_judicial.png' %}" class="logo" > -->
+          </a>
+
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,14 +17,8 @@
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="#">Documentos</a>
             </li>
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="/documentos/subir">Subir Documentos</a>
-            </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Generar Reporte</a>
-            </li> -->
-            <li class="nav-item">
-              <a class="nav-link" href="#">Administrador</a>
+              <a class="nav-link" href="/admin">Administrador</a>
             </li>
           </ul>
         </div>

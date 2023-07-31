@@ -7,6 +7,7 @@ from django.conf import settings
 
 from .upload_files import *
 from .process_data import *
+from .process_data_entidad import *
 from .process_data_planilla import *
 from .process_data_patronales import * 
 
@@ -14,7 +15,7 @@ from .process_data_patronales import *
 def upload_data_entidades(request):
     if request.method == 'POST' and request.FILES.get('formFile'):
         upload_file = request.FILES['formFile']
-        new_file_name = 'datos entidades.xlsx'
+        new_file_name = 'datos_entidades.xlsx'
         path = os.path.join(settings.MEDIA_ROOT, new_file_name)
         save_path = save_uploaded_file(upload_file, path)
         show_alert = False
@@ -119,3 +120,7 @@ def upload_documents( request ):
                 
                         
     return render( request, 'load_documents.html')
+
+def render_list_entidades (request):
+    entidades = Entidad.objects.all()
+    return render(request, 'list_entidades.html', {'entidades':entidades})

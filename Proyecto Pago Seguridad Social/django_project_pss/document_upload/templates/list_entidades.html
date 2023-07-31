@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Subir Datos entidades{% endblock %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+
+<div class="container my-5">
+    <h1>Lista Entidades</h1>
+    <table class="table table-striped" id="entity-table" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>NIT</th>
+                <th>Concepto</th>
+                <th>Razon</th>
+                <th>Rubro</th>
+                <!-- <th>Tipo Cuenta por Pagar</th> -->
+                <th>Codigo</th>
+                <!-- <th>Tipo Gasto</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for entidad in entidades %}
+            <tr>
+                <td>{{ entidad.NIT }}</td>
+                <td>{{ entidad.concepto }}</td>
+                <td>{{ entidad.razonEntidad }}</td>
+                <td>{{ entidad.rubro }}</td>
+                <!-- <td>{{ entidad.tipoCuentaPagar }}</td> -->
+                <td>{{ entidad.codigo }}</td>
+                <!-- <td>{{ entidad.idTipoGasto }}</td> -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let tabla = new DataTable('#entity-table', {
+            responsive: true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, 100]],
+            "language": {
+                searchPlaceholder: "Búsqueda",
+                paginate: {
+                    first: "Primera",
+                    last: "Ultima",
+                    previous: "Anterior",
+                    next: "Siguiente",
+                },
+                url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json',
+                search: "Buscar: ",
+                processing: "Tratamiento en curso...",
+                "lengthMenu": "Mostrar _MENU_  registros",
+                "zeroRecords": "No se encontró ningún registro en el rango de fecha",
+                "info": "Mostrando registros del _PAGE_ al _PAGES_ de un total de _MAX_ registros",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)"
+            },
+        });
+    })
+</script>
+
+
+{% endblock %}

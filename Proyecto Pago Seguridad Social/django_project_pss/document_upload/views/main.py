@@ -124,3 +124,6 @@ def upload_documents( request ):
 def render_list_entidades (request):
     entidades = Entidad.objects.all()
     return render(request, 'list_entidades.html', {'entidades':entidades})
+
+def render_list_plantillas(request):
+    return render (request, 'list_plantillas.html')

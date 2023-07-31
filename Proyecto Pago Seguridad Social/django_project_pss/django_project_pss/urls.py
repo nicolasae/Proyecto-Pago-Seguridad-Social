@@ -11,7 +11,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('documentos/', render_documents_page, name = 'documentos'),
     path('documentos/', include('document_upload.urls')),
-    path('documentos/', include('report_generation.urls')),
+    path('reportes/', render_reports_page, name = 'reportes'),
+    path('reportes/', include('report_generation.urls')),
 ]
 
 # Configuración para servir archivos estáticos en desarrollo

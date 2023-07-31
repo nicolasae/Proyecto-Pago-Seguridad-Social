@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+    <section class="row-cabecera">
+        {% include "navbar.html" %} 
+    </section>
+
+    <main class="cuerpo-contenido">          
+        <h1> Generar Reporte</h1>
+        <form  method="post" action="{% url 'descargar' %}">
+            {% csrf_token %}
+
+            <section class="d-flex row">
+                <div class="col-6">
+                    <label for="selectYear">Año:</label>
+                    <select class="form-select" id="selectYear" name="selectYear"></select>
+                </div>
+
+                <div class="col-6">
+                    <label for="selectMonth">Mes:</label>
+                    <select class="form-select" id="selectMonth" name="selectMonth">
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+
+            </section>
+            
+            <section class="d-flex justify-content-center mt-5">
+                <button type="submit" class="btn-outline-local" name="btn_resumen_planilla">
+                    Resumen Planilla
+                </button>
+                <button type="submit" class="btn-outline-local" name="btn_resumen_patronales_temporales">
+                    Resumen Patronales Temporales
+                </button>
+                <button type="submit" class="btn-outline-local" name="btn_resumen_patronales_permanentes">
+                    Resumen Patronales Permanentes
+                </button>
+            </section>
+        </form>
+    </main>
+
+    <script>
+        // Obtener referencias a los elementos select
+        const selectYear = document.getElementById('selectYear');
+        const selectMonth = document.getElementById('selectMonth');
+    
+        // Obtener el año actual
+        const currentYear = new Date().getFullYear();
+    
+        // Rellenar el select de años con los últimos 10 años
+        for (let i = currentYear; i >= currentYear - 10; i--) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            selectYear.appendChild(option);
+        }
+    
+        // Establecer el año actual como valor predeterminado
+        selectYear.value = currentYear;
+    
+        // Escuchar eventos de cambio en el select de años
+        selectYear.addEventListener('change', updateSelectedDate);
+    
+        // Escuchar eventos de cambio en el select de meses
+        selectMonth.addEventListener('change', updateSelectedDate);
+    
+        // Función para actualizar la fecha seleccionada
+        function updateSelectedDate() {
+            const selectedYear = selectYear.value;
+            const selectedMonth = selectMonth.value;
+    
+            // // Aquí puedes hacer lo que necesites con la fecha seleccionada
+            console.log(`Año seleccionado: ${selectedYear}`);
+            console.log(`Mes seleccionado: ${selectedMonth}`);
+        }
+    </script>
+
+{% endblock %}

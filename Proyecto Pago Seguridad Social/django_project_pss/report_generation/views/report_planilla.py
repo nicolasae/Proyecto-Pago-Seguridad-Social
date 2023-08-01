@@ -1,5 +1,6 @@
 import openpyxl
 from django.http import HttpResponse
+from django.db.models import Sum
 
 from document_upload.models import *
 
@@ -115,44 +116,79 @@ def write_info_planilla_data(sheet, info_planilla):
             row_num += 1
 
 def write_values_planilla_data(sheet, values_planilla):
-    suma_num_afiliados = 0
-    suma_fondo_solidaridad = 0
-    suma_fondo_subsistencia = 0
-    suma_intereses = 0
-    suma_sin_intereses = 0
-    suma_total = 0
+    distinct_razon_entidades = Entidad.objects.order_by('razonEntidad').values_list('razonEntidad', flat=True).distinct()
 
-    for index, planilla in enumerate(values_planilla, start=2): 
-        
-        suma_num_afiliados += planilla.numeroAfiliados
-        suma_fondo_solidaridad += planilla.fondoSolidaridad
-        suma_fondo_subsistencia += planilla.fondoSubsistencia
-        suma_intereses += planilla.totalIntereses
-        suma_sin_intereses += planilla.valorPagarSinIntereses
-        suma_total += planilla.valorPagar
+    # Initialize row_index for the first group
+    row_index = 2
 
-        sheet[f"A{index}"] = planilla.NIT.codigo
-        sheet[f"B{index}"] = planilla.NIT_id
-        sheet[f"C{index}"] = planilla.NIT.concepto
-        sheet[f"D{index}"] = planilla.numeroAfiliados
-        sheet[f"E{index}"] = planilla.fondoSolidaridad
-        sheet[f"F{index}"] = planilla.fondoSubsistencia
-        sheet[f"G{index}"] = planilla.totalIntereses
-        sheet[f"H{index}"] = planilla.valorPagarSinIntereses
-        sheet[f"I{index}"] = planilla.valorPagar
+    for razon_entidad in distinct_razon_entidades:
+        # Filter values_planilla for the current razon_entidad
+        values_planilla_filtered = values_planilla.filter(NIT__razonEntidad=razon_entidad)
 
-    total_data = [
+        suma_num_afiliados = 0
+        suma_fondo_solidaridad = 0
+        suma_fondo_subsistencia = 0
+        suma_intereses = 0
+        suma_sin_intereses = 0
+        suma_total = 0
+
+        for planilla in values_planilla_filtered: 
+            suma_num_afiliados += planilla.numeroAfiliados
+            suma_fondo_solidaridad += planilla.fondoSolidaridad
+            suma_fondo_subsistencia += planilla.fondoSubsistencia
+            suma_intereses += planilla.totalIntereses
+            suma_sin_intereses += planilla.valorPagarSinIntereses
+            suma_total += planilla.valorPagar
+
+            sheet[f"A{row_index}"] = planilla.NIT.codigo
+            sheet[f"B{row_index}"] = planilla.NIT_id
+            sheet[f"C{row_index}"] = planilla.NIT.concepto
+            sheet[f"D{row_index}"] = planilla.numeroAfiliados
+            sheet[f"E{row_index}"] = planilla.fondoSolidaridad
+            sheet[f"F{row_index}"] = planilla.fondoSubsistencia
+            sheet[f"G{row_index}"] = planilla.totalIntereses
+            sheet[f"H{row_index}"] = planilla.valorPagarSinIntereses
+            sheet[f"I{row_index}"] = planilla.valorPagar
+
+            # Increment the row_index for the next row
+            row_index += 1
+
+        total_data = [
+            "",
+            "",
+            f"SUBTOTAL {razon_entidad}",
+            suma_num_afiliados,
+            suma_fondo_solidaridad,
+            suma_fondo_subsistencia,
+            suma_intereses,
+            suma_sin_intereses,
+            suma_total
+        ]
+
+        sheet.cell(row=row_index, column=1, value=total_data[0])
+        sheet.cell(row=row_index, column=2, value=total_data[1])
+        sheet.cell(row=row_index, column=3, value=total_data[2])
+        for col_idx, value in enumerate(total_data[3:], start=4):
+            sheet.cell(row=row_index, column=col_idx, value=value)
+
+        # Increment the row_index for the next group
+        row_index += 1
+
+    # Calculate the grand total using all values in values_planilla
+    grand_total_data = [
         "",
         "",
         "TOTAL",
-        suma_num_afiliados,
-        suma_fondo_solidaridad,
-        suma_fondo_subsistencia,
-        suma_intereses,
-        suma_sin_intereses,
-        suma_total
+        values_planilla.aggregate(Sum('numeroAfiliados'))['numeroAfiliados__sum'],
+        values_planilla.aggregate(Sum('fondoSolidaridad'))['fondoSolidaridad__sum'],
+        values_planilla.aggregate(Sum('fondoSubsistencia'))['fondoSubsistencia__sum'],
+        values_planilla.aggregate(Sum('totalIntereses'))['totalIntereses__sum'],
+        values_planilla.aggregate(Sum('valorPagarSinIntereses'))['valorPagarSinIntereses__sum'],
+        values_planilla.aggregate(Sum('valorPagar'))['valorPagar__sum']
     ]
 
-    additional_row_index = len(values_planilla) + 2 
-    for col_idx, value in enumerate(total_data, start=1):
-        sheet.cell(row=additional_row_index, column=col_idx, value=value)
+    sheet.cell(row=row_index, column=1, value=grand_total_data[0])
+    sheet.cell(row=row_index, column=2, value=grand_total_data[1])
+    sheet.cell(row=row_index, column=3, value=grand_total_data[2])
+    for col_idx, value in enumerate(grand_total_data[3:], start=4):
+        sheet.cell(row=row_index, column=col_idx, value=value)

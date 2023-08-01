@@ -38,10 +38,10 @@ class Motivo(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     tipoPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
     fecha = models.CharField(max_length=10)
-    unidad2 = models.IntegerField()
-    unidad8 = models.IntegerField()
-    unidad9 = models.IntegerField()
-    total = models.IntegerField()
+    unidad2 = models.IntegerField(default=0)
+    unidad8 = models.IntegerField(default=0)
+    unidad9 = models.IntegerField(default=0)
+    total = models.IntegerField(default=0)
 
     class Meta:
         # Definir la combinación de campos que debe ser única
@@ -73,11 +73,11 @@ class valoresPlanilla(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
     numeroAfiliados = models.IntegerField()
-    fondoSolidaridad = models.IntegerField()
-    fondoSubsistencia = models.IntegerField()
+    fondoSolidaridad = models.IntegerField(default=0)
+    fondoSubsistencia = models.IntegerField(default=0)
     totalIntereses = models.IntegerField(default=0)
-    valorPagarSinIntereses = models.IntegerField()
-    valorPagar = models.IntegerField()
+    valorPagarSinIntereses = models.IntegerField(default=0)
+    valorPagar = models.IntegerField(default=0)
 
     class Meta:
         # Definir la combinación de campos que debe ser única

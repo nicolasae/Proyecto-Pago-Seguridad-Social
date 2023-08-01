@@ -12,6 +12,13 @@
 
     <main class="cuerpo-contenido">          
         <h1> Generar Reporte</h1>
+
+        {% if show_alert %}
+            <div class="alert alert-{{ alert_type }}" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+
         <form  method="post" action="{% url 'descargar' %}">
             {% csrf_token %}
 
@@ -48,7 +55,7 @@
                 <button type="submit" class="btn-outline-local" name="btn_resumen_patronales_temporales">
                     Resumen Patronales Temporales
                 </button>
-                <button type="submit" class="btn-outline-local" name="btn_resumen_patronales_temporales">
+                <button type="submit" class="btn-outline-local" name="btn_resumen_patronales_permanentes">
                     Resumen Patronales Permanentes
                 </button>
                 

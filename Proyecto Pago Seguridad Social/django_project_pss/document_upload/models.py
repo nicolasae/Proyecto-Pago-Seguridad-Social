@@ -24,12 +24,13 @@ class Gasto(models.Model):
 
 class Entidad(models.Model):
     NIT = models.CharField(max_length=50, primary_key=True, unique=True)
+    codigo = models.CharField(max_length=100,default = 'COD')
     idTipoGasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
     concepto = models.CharField(max_length=100)
     razonEntidad = models.CharField(max_length=100)
     rubro = models.CharField(max_length=100)
     tipoCuentaPagar = models.CharField(max_length=100)
-    codigo = models.CharField(max_length=100)
+    codigoDescuento = models.CharField(max_length=100, default = 'COD')
 
     def __str__(self):
         return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad}"

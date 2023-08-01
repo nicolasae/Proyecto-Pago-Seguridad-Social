@@ -16,6 +16,10 @@ def generate_excel_report_temporales(data, year, month):
     # Escribir los datos para la primera hoja
     write_temporales_data(sheet1, data)
 
+    # Asignar el nombre deseado a la hoja
+    sheet_name = f"Datos"
+    sheet1.title = sheet_name
+
     # Crear la respuesta HTTP y devolver el archivo para su descarga
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="Resumen Masivo Temporales-{year}-{month}.xlsx"'
@@ -34,9 +38,9 @@ def create_sheet_temporales(workbook):
         3: "CONCEPTO",
         4: "CONDIGO DEL CONCEPTO DE DESCUENTO",
         5: "TIPO CUENTA POR PAGAR",
-        6: "UNIDAD 2",
-        7: "UNIDAD 8",
-        8: "UNIDAD 9",
+        6: "TEMPORAL 2",
+        7: "TEMPORAL 8",
+        8: "TEMPORAL 9",
         9: "TOTAL",
     }
 

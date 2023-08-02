@@ -70,7 +70,7 @@ def copy_data_from_existing_sheet(source_sheet, target_sheet):
 
 def save_data_patronales(sheet,data):
     # Variable para rastrear el número de fila actual en la hoja de Excel
-    current_row = 3
+    current_row = 2
 
     # Recorrer el diccionario por cada NIT
     for nit, item in data.items():
@@ -88,7 +88,6 @@ def save_data_patronales(sheet,data):
 
         # Incrementar el número de fila actual para la próxima iteración
         current_row += 1
-
 
 def generate_excel_report_patronales(year, month):
     date = year + '/' + month

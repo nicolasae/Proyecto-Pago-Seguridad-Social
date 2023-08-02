@@ -1,6 +1,6 @@
 import openpyxl
+from collections import defaultdict
 from django.http import HttpResponse
-
 from document_upload.models import *
 
 def get_data_permanentes(date):
@@ -83,7 +83,6 @@ def write_permanentes_data(sheet, data):
         sheet[f"G{index}"] = motivo.unidad8
         sheet[f"H{index}"] = motivo.unidad9
         sheet[f"I{index}"] = motivo.total
-
 
     total_data = [
         "supernume",  

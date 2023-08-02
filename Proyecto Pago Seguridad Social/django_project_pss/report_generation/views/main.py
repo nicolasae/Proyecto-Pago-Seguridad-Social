@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from document_upload.models import *
 from .report_planilla import *
@@ -10,19 +11,11 @@ def download_view(request):
     if request.method == 'POST':
         selected_year = request.POST.get('selectYear')
         selected_month = request.POST.get('selectMonth')
-        show_alert = False
-
-        # try:
-        #     context = {
-        #         'show_alert': True,
-        #         'alert_type':"success",
-        #         'message':'El archivo se ha procesado correctamente.',
-        #     }
 
         if 'btn_resumen_planilla' in request.POST:
             # Acción para generar el resumen de la planilla
-            return create_report_planilla(selected_year,selected_month)
-        
+            return create_report_planilla(request,selected_year, selected_month)
+           
         if 'btn_resumen_patronales' in request.POST:
             # Acción para generar el resumen de la planilla
             return create_report_patronales(selected_year,selected_month)
@@ -33,33 +26,28 @@ def download_view(request):
         
         if 'btn_resumen_patronales_permanentes' in request.POST:
             # Aquí puedes realizar la acción para generar el resumen de las patronales           
-            return create_report_permanentes(selected_year, selected_month)
-            
-        # except Exception as e:
-        #     context = {
-        #         'show_alert': True,
-        #         'alert_type':"danger",
-        #         'message':'Ocurrió un error al descargar el archivo.',
-        #     }
-
-        #     # Error handling if something goes wrong while processing the file
-        #     print(f"Error processing the file: {str(e)}")
-
-        #     # You can add an error message in the response or redirect to an error page
-        #     return render(request, 'reports.html', context)  
+            return create_report_permanentes(selected_year, selected_month)           
     
-    # return redirect('reportes')
     return render(request, 'reports.html')
 
-def create_report_planilla(year,month):
+
+def create_report_planilla(request,year,month):
     date = year + '/' + month
     info_planilla = get_info_planilla(date)
-    values_planilla = get_values_planilla(date)
-    return generate_excel_report(info_planilla,values_planilla, year, month)
+    if info_planilla.exists():
+        values_planilla = get_values_planilla(date)       
+        return generate_excel_report(info_planilla,values_planilla, year, month)
+    else:
+        context = {
+            'show_alert': True,
+            'alert_type':"danger",
+            'message':f'No se ha podido descargar la planilla del periodo: {date}.',
+        }        
+        return render(request, 'reports.html', context)
+    
 
 def create_report_patronales(year,month):
     return generate_excel_report_patronales(year,month)
-
 
 def create_report_temporales(year, month):
     date = year + '/' + month

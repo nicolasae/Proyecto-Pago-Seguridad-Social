@@ -4,9 +4,21 @@ from django.http import HttpResponse
 from document_upload.models import *
 
 def get_data_temporales(date):
+    orden_personalizado = [
+        'SALUD',
+        'RIESGOS PROFESIONALES',
+        'PENSION',
+        'MEN',
+        'SENA',
+        'ESAP',
+        'ICBF',
+        'CAJA DE COMPENSACION FAMILIAR',
+    ]
     # Filtrar por tipoPatronal permanente y fecha
-    resultados = Motivo.objects.filter(tipoPatronal__tipo='temporal', fecha=date).order_by('NIT__razonEntidad')
-    return resultados
+    motivos = Motivo.objects.filter(tipoPatronal__tipo='temporal', fecha=date).order_by('NIT__razonEntidad')
+    motivos_ordenados = sorted(motivos, key=lambda motivo: orden_personalizado.index(motivo.NIT.razonEntidad))
+
+    return motivos_ordenados
 
 def generate_excel_report_temporales(data, year, month):
     # Crear un archivo de Excel para los datos de la planilla
@@ -36,7 +48,7 @@ def create_sheet_temporales(workbook):
         1: "NIT",
         2: "RUBRO",
         3: "CONCEPTO",
-        4: "CONDIGO DEL CONCEPTO DE DESCUENTO",
+        4: "CODIGO DEL CONCEPTO DE DESCUENTO",
         5: "TIPO CUENTA POR PAGAR",
         6: "TEMPORAL 2",
         7: "TEMPORAL 8",

@@ -4,9 +4,21 @@ from django.http import HttpResponse
 from document_upload.models import *
 
 def get_data_permanentes(date):
+    orden_personalizado = [
+        'SALUD',
+        'RIESGOS PROFESIONALES',
+        'PENSION',
+        'MEN',
+        'SENA',
+        'ESAP',
+        'ICBF',
+        'CAJA DE COMPENSACION FAMILIAR',
+    ]
     # Filtrar por tipoPatronal permanente y fecha
-    resultados = Motivo.objects.filter(tipoPatronal__tipo='permanente', fecha=date).order_by('NIT__razonEntidad')
-    return resultados
+    motivos = Motivo.objects.filter(tipoPatronal__tipo='permanente', fecha=date).order_by('NIT__razonEntidad')
+    motivos_ordenados = sorted(motivos, key=lambda motivo: orden_personalizado.index(motivo.NIT.razonEntidad))
+
+    return motivos_ordenados
 
 def generate_excel_report_permanentes(data, year, month):
     # Crear un archivo de Excel para los datos de la planilla

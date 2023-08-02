@@ -22,20 +22,26 @@
             <input class="form-control" type="file" name="formFile" id="formFile">
         </div>
 
-        <section class="d-flex justify-content-center">
-            <button type="submit" class="btn-outline-local">
-                Cargar Información
-            </button>
-            <a href="/media/datos_entidades.xlsx" download>
-                <button type="button" class="btn-outline-local">
-                    Descargar Información Actual
+        <section class="d-flex row justify-content-center btn-group mt-3">
+            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
+                <button type="submit" class="btn-outline-local">
+                    Cargar Información
                 </button>
-            </a>
-            <a href="/documentos/listar/entidades">
-                <button type="button" class="btn-outline-local">
-                    Listar Entidades
-                </button>
-            </a>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
+                <a href="/media/datos_entidades.xlsx" download>
+                    <button type="button" class="btn-outline-local">
+                        Descargar Información 
+                    </button>
+                </a>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
+                <a href="/documentos/listar/entidades">
+                    <button type="button" class="btn-outline-local">
+                        Listar Entidades
+                    </button>
+                </a>
+            </div>
         </section>
 
     </form>

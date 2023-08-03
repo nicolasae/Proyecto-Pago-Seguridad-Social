@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.shortcuts import render,redirect
 from django.conf import settings
 
-from .upload_files import *
+from .process_files import *
 from .process_data import *
 from .process_data_entidad import *
 from .process_data_planilla import *
@@ -52,13 +52,15 @@ def upload_data_entidades(request):
 
     return render(request, 'load_data_entidades.html')
 
-def upload_documents( request ):
+
+# This function handles document uploads and processing when the HTTP request method is POST.
+def upload_documents( request ):    
     if request.method == 'POST':
-        # Acceder a los datos del formulario que se envían a través del método POST
+        # Access the data from the form submitted via the POST method.
         selected_year = request.POST.get('selectYear')
         selected_month = request.POST.get('selectMonth')
 
-        # Definir la lista de diccionarios para los archivos
+        # Define a list of dictionaries representing different file types and their new names.
         filesDict = [
             {
                 'nombreFormulario': 'planilla',
@@ -92,38 +94,77 @@ def upload_documents( request ):
             # },
         ]
 
+       # Define the folder paths for saving the uploaded files in xlsx and csv formats.
         folder_path_xlsx = os.path.join(settings.MEDIA_ROOT, 'xlsx', selected_year, selected_month)
         folder_path_csv = os.path.join(settings.MEDIA_ROOT, 'csv', selected_year, selected_month)
         
+        # Ensure that the folders for saving the files exist; if not, create them.
         create_folder_if_not_exists(folder_path_xlsx)
         create_folder_if_not_exists(folder_path_csv)
 
+        # Lista para almacenar los nombres de los formularios que no se proporcionaron.
+        missing_files = []
+
+        # Loop through each file type and process the uploaded files.
         for file_info in filesDict:
             form_name = file_info['nombreFormulario']
             new_filename = file_info['nuevoNombreArchivo']
             new_filename_csv = file_info['nuevoNombreArchivoCSV']
             
+            # Get the uploaded file for the current file type.
             file = request.FILES.get(form_name)
-            path_file_xlsx = os.path.join(folder_path_xlsx, new_filename)
-            path_file_csv = os.path.join(folder_path_csv, new_filename_csv)
 
-            save_uploaded_file(file, path_file_xlsx)
-            converter_xlsx_to_csv(path_file_xlsx,path_file_csv)
-            clean_empty_rows_csv(path_file_csv)
-            # Guardar informacion de Planilla
-            if ( form_name == 'planilla'):
-                print('entro a planilla')
-                extract_data_for_planilla(path_file_csv,selected_year,selected_month)
-            if ( form_name == 'patronalesTemporales' ):
-                print('entro a temporales')
-                extract_data_patronales_temporales(path_file_csv,selected_year,selected_month)
-            if ( form_name == 'patronalesPermanentes' ):
-                print('entro a permanentes')
-                extract_data_patronales_permanentes(path_file_csv,selected_year,selected_month)
-                
-                        
-    return render( request, 'load_documents.html')
+            # Check if a file was provided for the current form_name before proceeding.
+            if file:
+                # Set the file paths for the xlsx and csv files.
+                path_file_xlsx = os.path.join(folder_path_xlsx, new_filename)
+                path_file_csv = os.path.join(folder_path_csv, new_filename_csv)
 
+                # Save the uploaded file to the xlsx folder.
+                save_uploaded_file(file, path_file_xlsx)
+
+                # Convert the xlsx file to csv format and save it in the csv folder.           
+                converter_xlsx_to_csv(path_file_xlsx, path_file_csv)
+
+                # Clean up the csv file by removing any empty rows.
+                clean_empty_rows_csv(path_file_csv)
+
+                # Based on the type of form, extract data from the processed csv file and save it.
+                if form_name == 'planilla':
+                    extract_data_for_planilla(path_file_csv, selected_year, selected_month)
+                if form_name == 'patronalesTemporales':
+                    extract_data_patronales_temporales(path_file_csv, selected_year, selected_month)
+                if form_name == 'patronalesPermanentes':
+                    extract_data_patronales_permanentes(path_file_csv, selected_year, selected_month)
+            else:
+                # Si no se proporcionó el archivo, agregar el nombre del formulario a la lista de archivos faltantes.
+                missing_files.append(form_name)
+
+        # Determine if all files were provided or if some are missing.
+        show_alert = len(missing_files) == 0
+        alert_type = "success" if show_alert else "danger"
+        message = 'Los archivos se han procesado correctamente.' if show_alert else 'Faltan archivos por subir.'
+
+    else:
+        # If it is not a POST request, initialize variables so that the alert is not shown.
+        missing_files = []
+        show_alert = False
+        alert_type = "success"  # Puedes establecerlo a "danger" si deseas un mensaje de error por defecto.
+        message = ''
+
+    # Dictionary with the context to pass to the 'load_documents.html' template.
+    context = {
+        'missing_files': missing_files,
+        'show_alert': show_alert,
+        'alert_type': alert_type,
+        'message': message,
+    }
+
+    # Render the 'load_documents.html' template with the provided context.
+    return render(request, 'load_documents.html', context)
+
+
+# Render views
 def render_list_entidades (request):
     entidades = Entidad.objects.all()
     return render(request, 'list_entidades.html', {'entidades':entidades})

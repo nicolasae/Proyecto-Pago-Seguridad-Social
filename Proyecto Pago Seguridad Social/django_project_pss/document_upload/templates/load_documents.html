@@ -11,6 +11,25 @@
 <main class="cuerpo-contenido">
     
     <h1>Subir documentos</h1>
+
+    {% if show_alert %}
+        <div class="alert alert-{{ alert_type }}">
+            {{ message }}
+        </div>
+    {% else %}
+        {% if missing_files %}
+            <div class="alert alert-{{ alert_type }}">
+                <p>Los siguientes archivos no se subieron:</p>
+                <ul>
+                    {% for file in missing_files %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <section class="d-flex row">
@@ -76,11 +95,13 @@
                 <input class="form-control" type="file" name="deduc9" id="deduc9">
             </div>
         </section>
+
         <div class="d-flex justify-content-center">
             <button class="btn-outline-local mt-3">
                 Subir documentos
             </button>
         </div>
+
     </form>
 
 </main>

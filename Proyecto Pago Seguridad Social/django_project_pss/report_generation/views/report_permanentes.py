@@ -15,7 +15,7 @@ def get_data_permanentes(date):
         'CAJA DE COMPENSACION FAMILIAR',
     ]
     # Filtrar por tipoPatronal permanente y fecha
-    motivos = Motivo.objects.filter(tipoPatronal__tipo='permanente', fecha=date).order_by('NIT__razonEntidad')
+    motivos = valoresPatron.objects.filter(tipoPatronal__tipo='permanente', fecha=date).order_by('NIT__razonEntidad')
     motivos_ordenados = sorted(motivos, key=lambda motivo: orden_personalizado.index(motivo.NIT.razonEntidad))
 
     return motivos_ordenados

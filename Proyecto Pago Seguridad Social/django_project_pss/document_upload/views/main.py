@@ -10,6 +10,7 @@ from .process_data import *
 from .process_data_entidad import *
 from .process_data_planilla import *
 from .process_data_patronales import * 
+from .process_data_deducciones import * 
 
 
 def upload_data_entidades(request):
@@ -77,21 +78,21 @@ def upload_documents( request ):
                 'nuevoNombreArchivo': f'Patronales Permanentes {selected_year}-{selected_month}.xlsx',
                 'nuevoNombreArchivoCSV': f'Patronales Permanentes {selected_year}-{selected_month} converted.csv',
             },
-            # {
-            #     'nombreFormulario': 'deduc2',
-            #     'nuevoNombreArchivo': f'Deducibles Unidad 2 {selected_year}-{selected_month}.xlsx',
-            #     'nuevoNombreArchivoCSV': f'Deducibles Unidad 2 {selected_year}-{selected_month} converted.csv',
-            # },
-            # {
-            #     'nombreFormulario': 'deduc8',
-            #     'nuevoNombreArchivo': f'Deducibles Unidad 8 {selected_year}-{selected_month}.xlsx',
-            #     'nuevoNombreArchivoCSV': f'Deducibles Unidad 8 {selected_year}-{selected_month} converted.csv',
-            # },
-            # {
-            #     'nombreFormulario': 'deduc9',
-            #     'nuevoNombreArchivo': f'Deducibles Unidad 9 {selected_year}-{selected_month}.xlsx',
-            #     'nuevoNombreArchivoCSV': f'Deducibles Unidad 9 {selected_year}-{selected_month} converted.csv',
-            # },
+            {
+                'nombreFormulario': 'deduc2',
+                'nuevoNombreArchivo': f'Deducibles Unidad 2 {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Deducibles Unidad 2 {selected_year}-{selected_month} converted.csv',
+            },
+            {
+                'nombreFormulario': 'deduc8',
+                'nuevoNombreArchivo': f'Deducibles Unidad 8 {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Deducibles Unidad 8 {selected_year}-{selected_month} converted.csv',
+            },
+            {
+                'nombreFormulario': 'deduc9',
+                'nuevoNombreArchivo': f'Deducibles Unidad 9 {selected_year}-{selected_month}.xlsx',
+                'nuevoNombreArchivoCSV': f'Deducibles Unidad 9 {selected_year}-{selected_month} converted.csv',
+            },
         ]
 
        # Define the folder paths for saving the uploaded files in xlsx and csv formats.
@@ -136,8 +137,18 @@ def upload_documents( request ):
                     extract_data_patronales_temporales(path_file_csv, selected_year, selected_month)
                 if form_name == 'patronalesPermanentes':
                     extract_data_patronales_permanentes(path_file_csv, selected_year, selected_month)
+                if form_name == 'deduc2':
+                    unidad = 2
+                    extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)
+                if form_name == 'deduc8':
+                    unidad = 8
+                    extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)
+                if form_name == 'deduc9':
+                    unidad = 9
+                    extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)
+
             else:
-                # Si no se proporcionó el archivo, agregar el nombre del formulario a la lista de archivos faltantes.
+                # If the file was not provided, add the name of the form to the list of missing files.
                 missing_files.append(form_name)
 
         # Determine if all files were provided or if some are missing.

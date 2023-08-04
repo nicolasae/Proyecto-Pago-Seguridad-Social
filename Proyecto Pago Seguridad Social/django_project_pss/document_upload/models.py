@@ -35,7 +35,7 @@ class Entidad(models.Model):
     def __str__(self):
         return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad}"
     
-class Motivo(models.Model):
+class valoresPatron(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     tipoPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
     fecha = models.CharField(max_length=10)
@@ -50,6 +50,20 @@ class Motivo(models.Model):
 
     def __str__(self):
         return f"Fecha:{self.fecha} {self.NIT} - {self.tipoPatronal} - Total: {self.total}"
+    
+class valoresEmpleado(models.Model):
+    NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
+    periodo = models.CharField(max_length=10)
+    unidad = models.IntegerField()
+    numDoc = models.CharField(max_length=30)
+    saldo = models.IntegerField(default=0)
+
+    class Meta:
+        # Definir la combinación de campos que debe ser única
+        unique_together = ('NIT', 'numDoc', 'periodo',)
+
+    def __str__(self):
+        return f"{self.NIT} - Unidad: {self.unidad}"
 
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)

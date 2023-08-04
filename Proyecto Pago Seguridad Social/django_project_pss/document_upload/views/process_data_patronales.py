@@ -28,19 +28,19 @@ def save_data_patronales_temporales(data,year=None,month=None):
             entidad_instance = Entidad.objects.get(NIT = NIT)
         except Entidad.DoesNotExist:
             print(f"Error: No Gasto instance found with type '{ NIT }'")
-            return
+            continue
 
         try:
             patronal_instace = Patronal.objects.get(tipo=TIPO_PATRONAL_CONSTANTE)
         except Patronal.DoesNotExist:
             print(f"Error: No Patronal instance found with type '{ TIPO_PATRONAL_CONSTANTE }'")
-            return
+            continue
         
         total_unidades = int(item[2]) + int(item[3]) + int(item[4])
         periodo = year + '/' + month
         
         # Use get_or_create instead of create to ensure uniqueness
-        motivo, created = Motivo.objects.get_or_create(
+        motivo, created = valoresPatron.objects.get_or_create(
             NIT=entidad_instance,
             tipoPatronal=patronal_instace,
             fecha=periodo,
@@ -83,7 +83,7 @@ def save_data_patronales_permanentes(data,year=None,month=None):
         periodo = year + '/' + month
         
         # Use get_or_create instead of create to ensure uniqueness
-        motivo, created = Motivo.objects.get_or_create(
+        motivo, created = valoresPatron.objects.get_or_create(
             NIT=entidad_instance,
             tipoPatronal=patronal_instace,
             fecha=periodo,

@@ -21,18 +21,19 @@ def get_data_permanentes(date):
     return motivos_ordenados
 
 def generate_excel_report_permanentes(data, year, month):
-    # Crear un archivo de Excel para los datos de la planilla
+    # Create an Excel file for the spreadsheet data
     workbook = openpyxl.Workbook()
     sheet1 = create_sheet_permanentes(workbook)
 
-    # Escribir los datos para la primera hoja
+    # Write the data for the first sheet
     write_permanentes_data(sheet1, data)
 
-    # Asignar el nombre deseado a la hoja
+    # Assign the desired name to the sheet
     sheet_name = f"Datos"
     sheet1.title = sheet_name
 
-    # Crear la respuesta HTTP y devolver el archivo para su descarga
+    
+    # Create the HTTP response and return the file for download
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="Resumen Masivo Permanentes-{year}-{month}.xlsx"'
     workbook.save(response)

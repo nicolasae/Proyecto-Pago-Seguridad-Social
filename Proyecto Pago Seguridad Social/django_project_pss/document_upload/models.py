@@ -53,14 +53,14 @@ class valoresPatron(models.Model):
     
 class valoresEmpleado(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
-    periodo = models.CharField(max_length=10)
+    fecha = models.CharField(max_length=10)
     unidad = models.IntegerField()
     numDoc = models.CharField(max_length=30)
     saldo = models.IntegerField(default=0)
 
     class Meta:
         # Definir la combinación de campos que debe ser única
-        unique_together = ('NIT', 'numDoc', 'periodo',)
+        unique_together = ('NIT', 'numDoc', 'fecha',)
 
     def __str__(self):
         return f"{self.NIT} - Unidad: {self.unidad}"

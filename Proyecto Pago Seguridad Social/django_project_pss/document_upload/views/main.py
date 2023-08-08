@@ -12,7 +12,6 @@ from .process_data_planilla import *
 from .process_data_patronales import * 
 from .process_data_deducciones import * 
 
-
 def upload_data_entidades(request):
     if request.method == 'POST' and request.FILES.get('formFile'):
         upload_file = request.FILES['formFile']
@@ -52,7 +51,6 @@ def upload_data_entidades(request):
             return render(request, 'load_data_entidades.html', context)
 
     return render(request, 'load_data_entidades.html')
-
 
 # This function handles document uploads and processing when the HTTP request method is POST.
 def upload_documents( request ):    
@@ -173,7 +171,6 @@ def upload_documents( request ):
 
     # Render the 'load_documents.html' template with the provided context.
     return render(request, 'load_documents.html', context)
-
 
 # Render views
 def render_list_entidades (request):

@@ -1,5 +1,6 @@
 import openpyxl 
 from openpyxl import load_workbook
+from openpyxl.styles import NamedStyle
 from django.http import HttpResponse
 from document_upload.models import *
 
@@ -167,31 +168,93 @@ def merger_data_consolidado(data_empleadores, data_patron):
 
 def save_data(sheet,data):
     merge_data = merger_data_consolidado(data['Valores empleado'], data['Valores patron'])
-
+    
     # Variable to track the current row number in the excel sheet
     current_row = 3
+    sum_empleado_un2 = 0
+    sum_empleado_un8 = 0
+    sum_empleado_un9 = 0
+    total_empleado = 0
+    sum_patron_temp2 = 0
+    sum_patron_temp8 = 0
+    sum_patron_temp9 = 0
+    sum_patron_perm2 = 0
+    sum_patron_perm8 = 0
+    sum_patron_perm9 = 0
+    total_patron = 0
+    total = 0
+
+    currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
 
     for nit, item in merge_data.items():
         entidad = Entidad.objects.filter(NIT=nit).first()
-        print(item.get('empleado', {}).get('UNIDAD 2'))
+
+        sum_empleado_un2 += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2'))      
+        sum_empleado_un8 += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))      
+        sum_empleado_un9 += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9'))      
+        total_empleado += convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
+        sum_patron_temp2 += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
+        sum_patron_temp8 += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
+        sum_patron_temp9 += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9')) 
+        sum_patron_perm2 += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2'))
+        sum_patron_perm8 += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8'))
+        sum_patron_perm9 += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9'))
+        total_patron += convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
+        total = total_empleado + total_patron
 
         sheet[f"A{current_row}"] = entidad.NIT
         sheet[f"B{current_row}"] = entidad.rubro
         sheet[f"C{current_row}"] = entidad.concepto
-
         sheet[f"D{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2')) 
+        sheet[f"D{current_row}"].style = currency_style
         sheet[f"E{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8')) 
+        sheet[f"E{current_row}"].style = currency_style
         sheet[f"F{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9')) 
+        sheet[f"F{current_row}"].style = currency_style
         sheet[f"G{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
+        sheet[f"G{current_row}"].style = currency_style
         sheet[f"H{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
+        sheet[f"H{current_row}"].style = currency_style
         sheet[f"I{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
+        sheet[f"I{current_row}"].style = currency_style
         sheet[f"J{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9'))
+        sheet[f"J{current_row}"].style = currency_style
         sheet[f"K{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2')) 
+        sheet[f"K{current_row}"].style = currency_style
         sheet[f"L{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8')) 
+        sheet[f"L{current_row}"].style = currency_style
         sheet[f"M{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9')) 
+        sheet[f"M{current_row}"].style = currency_style
         sheet[f"N{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TOTAL')) 
+        sheet[f"N{current_row}"].style = currency_style
+        sheet[f"O{current_row}"] = total
+        sheet[f"O{current_row}"].style = currency_style
 
-    # Increment the current row number for the next iteration
+        # Increment the current row number for the next iteration
         current_row += 1
+    
+    total_data = [
+        "",
+        "",
+        "TOTAL",
+        sum_empleado_un2,
+        sum_empleado_un8,
+        sum_empleado_un9,
+        total_empleado,
+        sum_patron_temp2,
+        sum_patron_temp8,
+        sum_patron_temp9,
+        sum_patron_perm2,
+        sum_patron_perm8,
+        sum_patron_perm9,
+        total_patron,
+    ]
+
+    additional_row_index = current_row 
+    for col_idx, value in enumerate(total_data, start=1):
+        cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        if isinstance(value, (int, float)):
+            cell.style = currency_style
+     
 
 

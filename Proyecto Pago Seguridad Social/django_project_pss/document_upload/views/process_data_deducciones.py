@@ -1,5 +1,8 @@
+from django.db.models import Q
+
 from ..models import *
 from .process_data import *
+
 
 def extract_data_deducciones(csv_file_path, year, month,unidad):
     clean_data_deducciones(csv_file_path)
@@ -47,9 +50,16 @@ def calculate_accumulated_balance(data):
 
     return sum_by_entity
 
-def get_entidad_instance(nit):
+def get_entidad_instance(nit):       
     try:
-        return Entidad.objects.get(NIT=nit)
+        entidad_instace = Entidad.objects.get(NIT=nit)
+        razones_entidad_filtrar = ['SALUD', 'RIESGOS PROFESIONALES', 'PENSION']
+        if entidad_instace.razonEntidad in razones_entidad_filtrar:
+            print(entidad_instace)
+            return entidad_instace
+        else:
+            return None  
+
     except Entidad.DoesNotExist:
         print(f"Error: No Entidad instance found with NIT '{nit}'")
         return None
@@ -63,19 +73,20 @@ def save_data_to_valores_empleado(data, unidad, year=None, month=None):
         num_doc = values[1]
 
         entidad_instance = get_entidad_instance(nit)
+
         if not entidad_instance:
             continue
         
         # Check if the record already exists before creating a new one
         try:
-            empleado_instance = valoresEmpleado.objects.get(NIT=entidad_instance, numDoc=num_doc, periodo=periodo)
+            empleado_instance = valoresEmpleado.objects.get(NIT=entidad_instance, numDoc=num_doc, fecha=periodo)
             # If the record already exists, update it with the new values
             empleado_instance.saldo = saldo
         except valoresEmpleado.DoesNotExist:
             # If the record does not exist, create a new one
             empleado_instance = valoresEmpleado(
                 NIT=entidad_instance,
-                periodo=periodo,
+                fecha=periodo,
                 unidad=unidad,
                 numDoc=num_doc,
                 saldo=saldo

@@ -68,7 +68,7 @@ def save_data_deducciones(sheet,data):
         suma_unidad2 += item['UNIDAD 2']
         suma_unidad8 += item['UNIDAD 8']
         suma_unidad9 += item['UNIDAD 9']
-        suma_total += suma_unidad2 + suma_unidad8 + suma_unidad9
+        
 
         sheet[f"A{current_row}"] = nit
         sheet[f"B{current_row}"] = item['RUBRO']
@@ -80,7 +80,7 @@ def save_data_deducciones(sheet,data):
        
         # Increment the current row number for the next iteration
         current_row += 1
-
+    suma_total += suma_unidad2 + suma_unidad8 + suma_unidad9
     total_data = [
         "",  
         "",

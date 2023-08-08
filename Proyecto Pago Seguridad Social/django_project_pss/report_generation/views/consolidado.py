@@ -14,6 +14,9 @@ orden_personalizado = [
     'CAJA DE COMPENSACION FAMILIAR',
 ]
 
+def convert_empty_to_zero(value):
+    return value if value != None else 0
+
 def generate_excel_report_consolidado(data, year, month):
 
     source_file  = 'media/plantillas/Consolidado.xlsx'
@@ -169,20 +172,24 @@ def save_data(sheet,data):
     current_row = 3
 
     for nit, item in merge_data.items():
-        sheet[f"A{current_row}"] = nit
-        sheet[f"B{current_row}"] = item.get('patron', {}).get('RUBRO')
-        sheet[f"C{current_row}"] = item.get('patron', {}).get('CONCEPTO')
-        sheet[f"D{current_row}"] = item.get('empleado', {}).get('UNIDAD 2') 
-        sheet[f"E{current_row}"] = item.get('empleado', {}).get('UNIDAD 8') 
-        sheet[f"F{current_row}"] = item.get('empleado', {}).get('UNIDAD 9') 
-        sheet[f"G{current_row}"] = item.get('empleado', {}).get('TOTAL') 
-        sheet[f"H{current_row}"] = item.get('patron', {}).get('TEMPORAL UN 2') 
-        sheet[f"I{current_row}"] = item.get('patron', {}).get('TEMPORAL UN 8') 
-        sheet[f"J{current_row}"] = item.get('patron', {}).get('TEMPORAL UN 9') 
-        sheet[f"K{current_row}"] = item.get('patron', {}).get('PERMANENTE UN 2') 
-        sheet[f"L{current_row}"] = item.get('patron', {}).get('PERMANENTE UN 8') 
-        sheet[f"M{current_row}"] = item.get('patron', {}).get('PERMANENTE UN 9') 
-        sheet[f"N{current_row}"] = item.get('patron', {}).get('TOTAL') 
+        entidad = Entidad.objects.filter(NIT=nit).first()
+        print(item.get('empleado', {}).get('UNIDAD 2'))
+
+        sheet[f"A{current_row}"] = entidad.NIT
+        sheet[f"B{current_row}"] = entidad.rubro
+        sheet[f"C{current_row}"] = entidad.concepto
+
+        sheet[f"D{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2')) 
+        sheet[f"E{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8')) 
+        sheet[f"F{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9')) 
+        sheet[f"G{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
+        sheet[f"H{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
+        sheet[f"I{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
+        sheet[f"J{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9'))
+        sheet[f"K{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2')) 
+        sheet[f"L{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8')) 
+        sheet[f"M{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9')) 
+        sheet[f"N{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TOTAL')) 
 
     # Increment the current row number for the next iteration
         current_row += 1

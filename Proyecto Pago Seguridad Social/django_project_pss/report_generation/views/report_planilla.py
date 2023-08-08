@@ -6,6 +6,17 @@ from django.urls import reverse
 
 from document_upload.models import *
 
+orden_personalizado = [
+    'SALUD',
+    'RIESGOS PROFESIONALES',
+    'PENSION',
+    'MEN',
+    'SENA',
+    'ESAP',
+    'ICBF',
+    'CAJA DE COMPENSACION FAMILIAR',
+]
+
 def get_info_planilla(date):
     # Obtener los objetos de infoPlanilla filtrados por año y mes
     info_planilla = infoPlanilla.objects.filter(periodo=date)

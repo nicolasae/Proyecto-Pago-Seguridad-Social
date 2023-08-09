@@ -137,7 +137,7 @@ def save_data_patronales(sheet,data):
         cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
         if col_idx > 1:
             cell.style = currency_style
-            cell.font = bold_font
+        cell.font = bold_font
 
 def generate_excel_report_patronales(data, year, month):
 

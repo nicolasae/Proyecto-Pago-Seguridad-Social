@@ -194,10 +194,9 @@ def write_values_planilla_data(sheet, values_planilla):
 
         for col_idx, value in enumerate(total_data[3:], start=4):
             cell = sheet.cell(row=row_index, column=col_idx, value=value)
-            cell.font = bold_font
             if col_idx > 4:
                 cell.style = currency_style
-                cell.font = bold_font
+            cell.font = bold_font
 
         # Increment the row_index for the next group
         row_index += 1
@@ -222,8 +221,7 @@ def write_values_planilla_data(sheet, values_planilla):
     
     for col_idx, value in enumerate(grand_total_data[3:], start=4):
         cell = sheet.cell(row=row_index, column=col_idx, value=value)
-        cell.font = bold_font
         if col_idx > 4:
             cell.style = currency_style
-            cell.font = bold_font
+        cell.font = bold_font
         

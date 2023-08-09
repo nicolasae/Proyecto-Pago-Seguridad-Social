@@ -1,22 +1,29 @@
 import openpyxl 
 from openpyxl import load_workbook
+from openpyxl.styles import Font, Alignment, NamedStyle
+
 from django.http import HttpResponse
 from document_upload.models import *
 
-def get_data_deducciones(date):
-    orden_personalizado = [
-        'SALUD',
-        'RIESGOS PROFESIONALES',
-        'PENSION',
-        'MEN',
-        'SENA',
-        'ESAP',
-        'ICBF',
-        'CAJA DE COMPENSACION FAMILIAR',
-    ]
+# Styles
+bold_font = Font(bold=True)
+left_alignment = Alignment(horizontal='left')
+currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
 
+personalized_order = [
+    'SALUD',
+    'RIESGOS PROFESIONALES',
+    'PENSION',
+    'MEN',
+    'SENA',
+    'ESAP',
+    'ICBF',
+    'CAJA DE COMPENSACION FAMILIAR',
+]
+
+def get_data_deducciones(date):
     motivos = valoresEmpleado.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    motivos_ordenados = sorted(motivos, key=lambda motivo: orden_personalizado.index(motivo.NIT.razonEntidad))
+    motivos_ordenados = sorted(motivos, key=lambda motivo: personalized_order.index(motivo.NIT.razonEntidad))
 
     # Create a dictionary to store the information grouped by NIT
     data_dict = {}
@@ -51,9 +58,15 @@ def get_data_deducciones(date):
     return data_dict
 
 def copy_data_from_existing_sheet(source_sheet, target_sheet):
+    row_index = 1
     # Read the data from the original sheet and copy it to the new sheet
     for row in source_sheet.iter_rows(values_only=True):
         target_sheet.append(row)
+        for col_index, cell_value in enumerate(row, start=1):
+            target_cell = target_sheet.cell(row=row_index, column=col_index, value=cell_value)
+            target_cell.font = bold_font  
+        
+        row_index += 1
 
 def save_data_deducciones(sheet,data):
     suma_unidad2 = 0
@@ -69,7 +82,6 @@ def save_data_deducciones(sheet,data):
         suma_unidad8 += item['UNIDAD 8']
         suma_unidad9 += item['UNIDAD 9']
         
-
         sheet[f"A{current_row}"] = nit
         sheet[f"B{current_row}"] = item['RUBRO']
         sheet[f"C{current_row}"] = item['CONCEPTO']
@@ -77,9 +89,16 @@ def save_data_deducciones(sheet,data):
         sheet[f"E{current_row}"] = item['UNIDAD 8']
         sheet[f"F{current_row}"] = item['UNIDAD 9']
         sheet[f"G{current_row}"] = item['TOTAL']
+
+        # Add Styles 
+        sheet[f"D{current_row}"].style = currency_style 
+        sheet[f"E{current_row}"].style = currency_style  
+        sheet[f"F{current_row}"].style = currency_style  
+        sheet[f"G{current_row}"].style = currency_style  
        
         # Increment the current row number for the next iteration
         current_row += 1
+
     suma_total += suma_unidad2 + suma_unidad8 + suma_unidad9
     total_data = [
         "",  
@@ -93,11 +112,12 @@ def save_data_deducciones(sheet,data):
 
     additional_row_index = len(data) + 2 
     for col_idx, value in enumerate(total_data, start=1):
-        sheet.cell(row=additional_row_index, column=col_idx, value=value)
-
+        cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        if col_idx > 3:
+            cell.style = currency_style
+        cell.font = bold_font
 
 def generate_excel_report_deducciones(data, year, month):
-
     source_file  = 'media/plantillas/Resumen_deducciones.xlsx'
     # Load the existing excel file
     source_workbook = load_workbook(source_file)

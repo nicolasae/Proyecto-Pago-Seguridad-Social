@@ -27,7 +27,7 @@ def save_db_info_planilla(data,year=None,month=None):
 
     planilla = infoPlanilla (
         razonSocial = 'Rama Judicial',
-        periodo = periodo,
+        fecha = periodo,
         identificacion = data[1][1],
         codigoDependenciaSucursal = data[2][1],
         nomDependenciaSucursal = data[3][1],

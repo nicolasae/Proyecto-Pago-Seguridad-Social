@@ -1,12 +1,12 @@
 import openpyxl
+from openpyxl.styles import Font, Alignment, NamedStyle
+
 from django.http import HttpResponse
-from django.db.models import Sum
-from django.conf import settings
-from django.urls import reverse
+from django.db.models import Sum,Case, CharField, Value, When
 
 from document_upload.models import *
 
-orden_personalizado = [
+personalized_order = [
     'SALUD',
     'RIESGOS PROFESIONALES',
     'PENSION',
@@ -17,33 +17,64 @@ orden_personalizado = [
     'CAJA DE COMPENSACION FAMILIAR',
 ]
 
-def get_info_planilla(date):
-    # Obtener los objetos de infoPlanilla filtrados por año y mes
-    info_planilla = infoPlanilla.objects.filter(periodo=date)
+# Map model fields to the headers in the Excel file
+field_mapping = {
+    'razonSocial': 'RAZON SOCIAL',
+    'fecha': 'PERIODO',
+    'identificacion': 'IDENTIFICACION',
+    'codigoDependenciaSucursal': 'COD. DEPENDENCIA O SUCURSAL',
+    'nomDependenciaSucursal': 'NOM. DEPENDENCIA O SUCURSAL',
+    'fechaReporte': 'FECHA GENERACION REPORTE',
+    'fechaLimitePago': 'FECHA LIMITE DE PAGO',
+    'periodoPension': 'PERIODO PENSION',
+    'periodoSalud': 'PERIODO SALUD',
+    'numeroPlanilla': 'NUMERO PLANILLA',
+    'totalCotizantes': 'TOTAL COTIZANTES',
+    'PIN': 'REFERENCIA DE PAGO (PIN)',
+    'tipoPlanilla': 'TIPO DE PLANILLA',
+}
+
+# Styles
+bold_font = Font(bold=True)
+left_alignment = Alignment(horizontal='left')
+currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
+
+
+def get_info_planilla(date):   
+    # Get the datasheet objects filtered by year and month
+    info_planilla = infoPlanilla.objects.filter(fecha=date)
     return info_planilla
 
-def get_values_planilla(date):
-    # Primero, obtén el objeto infoPlanilla correspondiente al periodo deseado
-    info_planilla = infoPlanilla.objects.get(periodo=date)
+def get_values_planilla(date):    
+    # Create a dictionary to map entity names to indices
+    entidad_to_index = {entidad: index for index, entidad in enumerate(personalized_order)}
     
-    # Luego, realiza la consulta para obtener todos los valores de valoresPlanilla asociados al periodo
-    valores_planilla_filtrados = valoresPlanilla.objects.filter(numeroPlanilla=info_planilla).order_by('NIT__razonEntidad')
+    # Get the filtered objects and assign them order values
+    valores_planilla_filtrados = valoresPlanilla.objects.filter(
+        numeroPlanilla__fecha=date
+    ).annotate(
+        entidad_order=Case(
+            *[When(NIT__razonEntidad=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
+            default=Value(len(personalized_order)), output_field=CharField()
+        )
+    ).order_by('entidad_order')
 
     return valores_planilla_filtrados
 
 def generate_excel_report(info_planilla,values_planilla, year, month):
-    # Crear un archivo de Excel para los datos de la planilla
+    # Create an Excel file for the spreadsheet data
     workbook = openpyxl.Workbook()
+
     sheet1 = create_sheet_info_planilla(workbook)
     sheet2 = create_sheet_values_planilla(workbook)
-
-    # Escribir los datos para la primera hoja
+    
+    # Write the data to the first sheet
     write_info_planilla_data(sheet1, info_planilla)
 
-    # Escribir los datos para la segunda hoja
+    # Write the data to the second sheet
     write_values_planilla_data(sheet2, values_planilla)
 
-    # Crear la respuesta HTTP y devolver el archivo para su descarga
+    # Create the HTTP response and return the file for download
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="Planilla_Detallada-{year}-{month}.xlsx"'
     workbook.save(response)
@@ -52,28 +83,11 @@ def generate_excel_report(info_planilla,values_planilla, year, month):
 
 def create_sheet_info_planilla(workbook):
     sheet = workbook.active
-    sheet.title = f"Info Planilla"
+    sheet.title = f"Info Planilla"   
 
-    # Mapeo de campos del modelo con los encabezados en el archivo Excel
-    field_mapping = {
-        'razonSocial': 'RAZON SOCIAL',
-        'periodo': 'PERIODO',
-        'identificacion': 'IDENTIFICACION',
-        'codigoDependenciaSucursal': 'COD. DEPENDENCIA O SUCURSAL',
-        'nomDependenciaSucursal': 'NOM. DEPENDENCIA O SUCURSAL',
-        'fechaReporte': 'FECHA GENERACION REPORTE',
-        'fechaLimitePago': 'FECHA LIMITE DE PAGO',
-        'periodoPension': 'PERIODO PENSION',
-        'periodoSalud': 'PERIODO SALUD',
-        'numeroPlanilla': 'NUMERO PLANILLA',
-        'totalCotizantes': 'TOTAL COTIZANTES',
-        'PIN': 'REFERENCIA DE PAGO (PIN)',
-        'tipoPlanilla': 'TIPO DE PLANILLA',
-    }
-
-    # Escribir los encabezados en la columna A
     for row_num, header in enumerate(field_mapping.values(), start=1):
-        sheet.cell(row=row_num, column=1, value=header)
+        cell = sheet.cell(row=row_num, column=1, value=header)
+        cell.font = bold_font
 
     return sheet
 
@@ -95,28 +109,11 @@ def create_sheet_values_planilla(workbook):
 
     for col_idx, header_text in headers_sheet.items():
         cell = sheet.cell(row=1, column=col_idx, value=header_text)
+        cell.font = bold_font
 
     return sheet
 
-def write_info_planilla_data(sheet, info_planilla):
-    # Mapeo de campos del modelo con los encabezados en el archivo Excel
-    field_mapping = {
-        'razonSocial': 'RAZON SOCIAL',
-        'periodo':'PERIODO',
-        'identificacion': 'IDENTIFICACION',
-        'codigoDependenciaSucursal': 'COD. DEPENDENCIA O SUCURSAL',
-        'nomDependenciaSucursal': 'NOM. DEPENDENCIA O SUCURSAL',
-        'fechaReporte': 'FECHA GENERACION REPORTE',
-        'fechaLimitePago': 'FECHA LIMITE DE PAGO',
-        'periodoPension': 'PERIODO PENSION',
-        'periodoSalud': 'PERIODO SALUD',
-        'numeroPlanilla': 'NUMERO PLANILLA',
-        'totalCotizantes': 'TOTAL COTIZANTES',
-        'PIN': 'REFERENCIA DE PAGO (PIN)',
-        'tipoPlanilla': 'TIPO DE PLANILLA',
-    }
-
-    # # Escribir los encabezados en la columna A
+def write_info_planilla_data(sheet, info_planilla):   
     for row_num, header in enumerate(field_mapping.values(), start=1):
         sheet.cell(row=row_num, column=1, value=header)
 
@@ -125,16 +122,22 @@ def write_info_planilla_data(sheet, info_planilla):
         for key in field_mapping:
             attribute_name = key  # Get the attribute name from the field_mapping
             value = getattr(obj, attribute_name, '')  # Get the attribute value using getattr
-            sheet.cell(row = row_num, column = 2, value = value)
+            cell = sheet.cell(row = row_num, column = 2, value = value)
+            cell.alignment = left_alignment
             row_num += 1
 
 def write_values_planilla_data(sheet, values_planilla):
     distinct_razon_entidades = Entidad.objects.order_by('razonEntidad').values_list('razonEntidad', flat=True).distinct()
+    
+    distinct_razon_entidades_ordered = sorted(
+        distinct_razon_entidades,
+        key=lambda entidad: personalized_order.index(entidad) if entidad in personalized_order else len(personalized_order)
+    )
 
     # Initialize row_index for the first group
     row_index = 2
 
-    for razon_entidad in distinct_razon_entidades:
+    for razon_entidad in distinct_razon_entidades_ordered:
         # Filter values_planilla for the current razon_entidad
         values_planilla_filtered = values_planilla.filter(NIT__razonEntidad=razon_entidad)
 
@@ -163,6 +166,12 @@ def write_values_planilla_data(sheet, values_planilla):
             sheet[f"H{row_index}"] = planilla.valorPagarSinIntereses
             sheet[f"I{row_index}"] = planilla.valorPagar
 
+            sheet[f"E{row_index}"].style = currency_style
+            sheet[f"F{row_index}"].style = currency_style 
+            sheet[f"G{row_index}"].style = currency_style
+            sheet[f"H{row_index}"].style = currency_style 
+            sheet[f"I{row_index}"].style = currency_style
+
             # Increment the row_index for the next row
             row_index += 1
 
@@ -180,9 +189,15 @@ def write_values_planilla_data(sheet, values_planilla):
 
         sheet.cell(row=row_index, column=1, value=total_data[0])
         sheet.cell(row=row_index, column=2, value=total_data[1])
-        sheet.cell(row=row_index, column=3, value=total_data[2])
+        cell = sheet.cell(row=row_index, column=3, value=total_data[2])
+        cell.font = bold_font
+
         for col_idx, value in enumerate(total_data[3:], start=4):
-            sheet.cell(row=row_index, column=col_idx, value=value)
+            cell = sheet.cell(row=row_index, column=col_idx, value=value)
+            cell.font = bold_font
+            if col_idx > 4:
+                cell.style = currency_style
+                cell.font = bold_font
 
         # Increment the row_index for the next group
         row_index += 1
@@ -202,6 +217,13 @@ def write_values_planilla_data(sheet, values_planilla):
 
     sheet.cell(row=row_index, column=1, value=grand_total_data[0])
     sheet.cell(row=row_index, column=2, value=grand_total_data[1])
-    sheet.cell(row=row_index, column=3, value=grand_total_data[2])
+    cell = sheet.cell(row=row_index, column=3, value=grand_total_data[2])
+    cell.font = bold_font
+    
     for col_idx, value in enumerate(grand_total_data[3:], start=4):
-        sheet.cell(row=row_index, column=col_idx, value=value)
+        cell = sheet.cell(row=row_index, column=col_idx, value=value)
+        cell.font = bold_font
+        if col_idx > 4:
+            cell.style = currency_style
+            cell.font = bold_font
+        

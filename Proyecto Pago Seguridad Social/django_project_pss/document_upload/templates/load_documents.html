@@ -107,14 +107,15 @@
 </main>
 
 <script>
-    // Obtener referencias a los elementos select
+    // Get references to the select elements
     const selectYear = document.getElementById('selectYear');
     const selectMonth = document.getElementById('selectMonth');
 
-    // Obtener el año actual
+    // Get the current year and month
     const currentYear = new Date().getFullYear();
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0'); // Format month as 'MM'
 
-    // Rellenar el select de años con los últimos 10 años
+    // Populate the year select with the last 10 years
     for (let i = currentYear; i >= currentYear - 10; i--) {
         const option = document.createElement('option');
         option.value = i;
@@ -122,24 +123,26 @@
         selectYear.appendChild(option);
     }
 
-    // Establecer el año actual como valor predeterminado
+    // Set the current year as the default value
     selectYear.value = currentYear;
 
-    // Escuchar eventos de cambio en el select de años
+    // Select the current month in the month select
+    selectMonth.value = currentMonth;
+
+    // Listen for change events on the year select
     selectYear.addEventListener('change', updateSelectedDate);
 
-    // Escuchar eventos de cambio en el select de meses
+    // Listen for change events on the month select
     selectMonth.addEventListener('change', updateSelectedDate);
 
-    // Función para actualizar la fecha seleccionada
+    // Function to update the selected date
     function updateSelectedDate() {
         const selectedYear = selectYear.value;
         const selectedMonth = selectMonth.value;
-
-        // // Aquí puedes hacer lo que necesites con la fecha seleccionada
-        // console.log(`Año seleccionado: ${selectedYear}`);
-        // console.log(`Mes seleccionado: ${selectedMonth}`);
     }
+
+    // Initialize the selected date when the page loads
+    updateSelectedDate();
 </script>
 
 

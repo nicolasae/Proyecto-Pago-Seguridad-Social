@@ -68,7 +68,7 @@ class valoresEmpleado(models.Model):
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)
     razonSocial = models.CharField(max_length=100, default="Rama Judicial")
-    periodo = models.CharField(max_length=10,default='2023/06')
+    fecha = models.CharField(max_length=10,default='2023/06')
     identificacion = models.CharField(max_length=100)
     codigoDependenciaSucursal = models.CharField(max_length=100)
     nomDependenciaSucursal = models.CharField(max_length=100)
@@ -81,7 +81,7 @@ class infoPlanilla(models.Model):
     tipoPlanilla = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"Fecha reporte: {self.periodo} - Número planilla: {self.numeroPlanilla}"
+        return f"Fecha reporte: {self.fecha} - Número planilla: {self.numeroPlanilla}"
     
 class valoresPlanilla(models.Model):
     codigoEntidad = models.CharField(max_length=100)

@@ -1,22 +1,29 @@
 import openpyxl 
 from openpyxl import load_workbook
+from openpyxl.styles import Font, Alignment, NamedStyle
+
 from django.http import HttpResponse
 from document_upload.models import *
 
-def get_data_patronales(date):
-    orden_personalizado = [
-        'SALUD',
-        'RIESGOS PROFESIONALES',
-        'PENSION',
-        'MEN',
-        'SENA',
-        'ESAP',
-        'ICBF',
-        'CAJA DE COMPENSACION FAMILIAR',
-    ]
+# Styles
+bold_font = Font(bold=True)
+left_alignment = Alignment(horizontal='left')
+currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
 
+personalized_order = [
+    'SALUD',
+    'RIESGOS PROFESIONALES',
+    'PENSION',
+    'MEN',
+    'SENA',
+    'ESAP',
+    'ICBF',
+    'CAJA DE COMPENSACION FAMILIAR',
+]
+
+def get_data_patronales(date):    
     motivos = valoresPatron.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    motivos_ordenados = sorted(motivos, key=lambda motivo: orden_personalizado.index(motivo.NIT.razonEntidad))
+    motivos_ordenados = sorted(motivos, key=lambda motivo: personalized_order.index(motivo.NIT.razonEntidad))
 
     # Create a dictionary to store the information grouped by NIT
     data_dict = {}
@@ -27,7 +34,6 @@ def get_data_patronales(date):
         rubro = motivo.NIT.rubro
         concepto = motivo.NIT.concepto
         codigo_descuento = motivo.NIT.codigoDescuento
-        fecha = motivo.fecha
         total = motivo.total
 
         # Check if an entry for the NIT already exists in the dictionary
@@ -99,7 +105,16 @@ def save_data_patronales(sheet,data):
         sheet[f"I{current_row}"] = item['PERMANENTE UN 8']
         sheet[f"J{current_row}"] = item['PERMANENTE UN 9']
         sheet[f"K{current_row}"] = item['TOTAL']
-       
+
+        # Add styles to the cells
+        sheet[f"E{current_row}"].style = currency_style 
+        sheet[f"F{current_row}"].style = currency_style 
+        sheet[f"G{current_row}"].style = currency_style 
+        sheet[f"H{current_row}"].style = currency_style 
+        sheet[f"I{current_row}"].style = currency_style 
+        sheet[f"J{current_row}"].style = currency_style 
+        sheet[f"K{current_row}"].style = currency_style 
+               
         # Increment the current row number for the next iteration
         current_row += 1
 
@@ -119,7 +134,10 @@ def save_data_patronales(sheet,data):
 
     additional_row_index = len(data) + 2 
     for col_idx, value in enumerate(total_data, start=1):
-        sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        if col_idx > 1:
+            cell.style = currency_style
+            cell.font = bold_font
 
 def generate_excel_report_patronales(data, year, month):
 

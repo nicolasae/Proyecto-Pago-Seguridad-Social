@@ -1,29 +1,14 @@
 import openpyxl 
 from openpyxl import load_workbook
-from openpyxl.styles import Font, Alignment, NamedStyle
 
 from django.http import HttpResponse
 from document_upload.models import *
-
-# Styles
-bold_font = Font(bold=True)
-left_alignment = Alignment(horizontal='left')
-currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
-
-personalized_order = [
-    'SALUD',
-    'RIESGOS PROFESIONALES',
-    'PENSION',
-    'MEN',
-    'SENA',
-    'ESAP',
-    'ICBF',
-    'CAJA DE COMPENSACION FAMILIAR',
-]
+from .functions import *
+from .constants import *
 
 def get_data_patronales(date):    
     motivos = valoresPatron.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    motivos_ordenados = sorted(motivos, key=lambda motivo: personalized_order.index(motivo.NIT.razonEntidad))
+    motivos_ordenados = sorted(motivos, key=lambda motivo: PERSONALIZED_ORDER.index(motivo.NIT.razonEntidad))
 
     # Create a dictionary to store the information grouped by NIT
     data_dict = {}
@@ -67,11 +52,6 @@ def get_data_patronales(date):
         data_dict[NIT]['TOTAL'] += total
 
     return data_dict
-
-def copy_data_from_existing_sheet(source_sheet, target_sheet):
-    # Read the data from the original sheet and copy it to the new sheet
-    for row in source_sheet.iter_rows(values_only=True):
-        target_sheet.append(row)
 
 def save_data_patronales(sheet,data):
     suma_temporal2 = 0
@@ -120,7 +100,7 @@ def save_data_patronales(sheet,data):
 
     total_data = [
         "",  
-        "",
+        "A0102..",
         "",
         "TOTAL",
         suma_temporal2,

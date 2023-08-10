@@ -43,7 +43,7 @@ def create_report_planilla(request,year,month):
     date = year + '/' + month
     info_planilla = get_info_planilla(date)
 
-    if info_planilla.exists():
+    if info_planilla.exists():       
         values_planilla = get_values_planilla(date)   
         response = generate_excel_report(info_planilla, values_planilla, year, month)
     
@@ -118,14 +118,14 @@ def create_report_deducciones(request, year, month):
 def create_report_consolidado(request, year, month):
     date = year + '/' + month
     data = get_data_values(date)
-    return generate_excel_report_consolidado(data,year,month)
+    # return generate_excel_report_consolidado(data,year,month)
 
-    # if len(data) > 0:
-    #     return generate_excel_report_consolidado(data,year,month)
-    # else:
-    #     context = {
-    #         'show_alert': True,
-    #         'alert_type':"danger",
-    #         'message':f'No hay información disponible para realizar un informe consolidado del periodo: {date}.',
-    #     }        
-    #     return render(request, 'reports.html', context)
+    if len(data) > 0:
+        return generate_excel_report_consolidado(data,year,month)
+    else:
+        context = {
+            'show_alert': True,
+            'alert_type':"danger",
+            'message':f'No hay información disponible para realizar un informe consolidado del periodo: {date}.',
+        }        
+        return render(request, 'reports.html', context)

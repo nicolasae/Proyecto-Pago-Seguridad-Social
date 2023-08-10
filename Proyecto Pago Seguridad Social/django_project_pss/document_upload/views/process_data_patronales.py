@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from ..models import *
 from .process_data import *
 
@@ -95,5 +97,54 @@ def save_data_patronales_permanentes(data,year=None,month=None):
             }
         )
 
-    
+
+def extract_data_patronales(csv_file_path,year,month,type):
+    clean_data_patronales(csv_file_path)
    
+    data = read_data_from_csv(csv_file_path)
+    save_data_patronales(data,type, year, month)
+
+def save_data_patronales(data,type,year=None,month=None):
+    TIPO_PATRONAL_CONSTANTE = Patronal.objects.get(tipo=type) 
+
+    for item in data:
+        if (item[0] == '0'):
+            NIT = '860011153'
+        else:
+            NIT = item[0]
+
+        total_unidades = int(item[2]) + int(item[3]) + int(item[4])
+        periodo = year + '/' + month
+        
+        entidad_instance = Entidad.objects.filter(NIT=NIT).first()
+
+        if entidad_instance:
+            try:
+                valores_patron_instance = valoresPatron.objects.get(
+                    NIT=entidad_instance,
+                    tipoPatronal=TIPO_PATRONAL_CONSTANTE,
+                    fecha=periodo,
+                )
+
+                #If it does  exists, update values
+                valores_patron_instance.unidad2 += int(item[2])
+                valores_patron_instance.unidad8 += int(item[3])
+                valores_patron_instance.unidad9 += int(item[4])
+                valores_patron_instance.total += total_unidades
+                valores_patron_instance.save()
+
+            except valoresPatron.DoesNotExist:
+                # If it does not exist, create a new record
+                valores_patron_instance = valoresPatron(
+                    NIT=entidad_instance,
+                    tipoPatronal=TIPO_PATRONAL_CONSTANTE,
+                    fecha=periodo,
+                    unidad2=int(item[2]),
+                    unidad8=int(item[3]),
+                    unidad9=int(item[4]),
+                    total=total_unidades,
+                )
+                valores_patron_instance.save()
+        else:
+            print(f"Error: No Entidad instance found with NIT '{NIT}'")
+            return

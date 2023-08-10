@@ -132,9 +132,11 @@ def upload_documents( request ):
                 if form_name == 'planilla':
                     extract_data_for_planilla(path_file_csv, selected_year, selected_month)
                 if form_name == 'patronalesTemporales':
-                    extract_data_patronales_temporales(path_file_csv, selected_year, selected_month)
+                    tipo_patronal = 'temporal'
+                    extract_data_patronales(path_file_csv, selected_year, selected_month, tipo_patronal)
                 if form_name == 'patronalesPermanentes':
-                    extract_data_patronales_permanentes(path_file_csv, selected_year, selected_month)
+                    tipo_patronal = 'permanente'
+                    extract_data_patronales(path_file_csv, selected_year, selected_month, tipo_patronal)
                 if form_name == 'deduc2':
                     unidad = 2
                     extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)

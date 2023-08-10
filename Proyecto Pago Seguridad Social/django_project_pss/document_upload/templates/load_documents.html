@@ -13,18 +13,20 @@
     <h1>Subir documentos</h1>
 
     {% if show_alert %}
-        <div class="alert alert-{{ alert_type }}">
-            {{ message }}
+        <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% else %}
         {% if missing_files %}
-            <div class="alert alert-{{ alert_type }}">
+            <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
                 <p>Los siguientes archivos no se subieron:</p>
                 <ul>
                     {% for file in missing_files %}
                         <li>{{ file }}</li>
                     {% endfor %}
                 </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endif %}
     {% endif %}

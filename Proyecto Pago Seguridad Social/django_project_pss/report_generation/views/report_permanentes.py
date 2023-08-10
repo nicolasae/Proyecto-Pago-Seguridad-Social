@@ -1,7 +1,10 @@
 import openpyxl
 from collections import defaultdict
 from django.http import HttpResponse
+
 from document_upload.models import *
+from .constants import *
+from .functions import *
 
 def get_data_permanentes(date):
     orden_personalizado = [
@@ -85,6 +88,12 @@ def write_permanentes_data(sheet, data):
         sheet[f"H{index}"] = motivo.unidad9
         sheet[f"I{index}"] = motivo.total
 
+        # Add styles to the cells
+        sheet[f"F{index}"].style = currency_style 
+        sheet[f"G{index}"].style = currency_style 
+        sheet[f"H{index}"].style = currency_style 
+        sheet[f"I{index}"].style = currency_style 
+
     total_data = [
         "supernume",  
         "A0102..",
@@ -99,4 +108,7 @@ def write_permanentes_data(sheet, data):
 
     additional_row_index = len(data) + 2 
     for col_idx, value in enumerate(total_data, start=1):
-        sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        if col_idx > 4:
+            cell.style = currency_style
+        cell.font = bold_font

@@ -1,25 +1,17 @@
 import openpyxl 
 from openpyxl import load_workbook
-from openpyxl.styles import NamedStyle
-from django.http import HttpResponse
-from document_upload.models import *
+from openpyxl.utils import get_column_letter
 
-orden_personalizado = [
-    'SALUD',
-    'RIESGOS PROFESIONALES',
-    'PENSION',
-    'MEN',
-    'SENA',
-    'ESAP',
-    'ICBF',
-    'CAJA DE COMPENSACION FAMILIAR',
-]
+from django.http import HttpResponse
+from django.db.models import Sum,Case, CharField, Value, When
+from document_upload.models import *
+from .functions import *
+from .constants import *
 
 def convert_empty_to_zero(value):
     return value if value != None else 0
 
 def generate_excel_report_consolidado(data, year, month):
-
     source_file  = 'media/plantillas/Consolidado.xlsx'
     # Load the existing excel file
     source_workbook = load_workbook(source_file)
@@ -31,8 +23,30 @@ def generate_excel_report_consolidado(data, year, month):
     workbook = openpyxl.Workbook()
     sheet1 = workbook.active
 
-    # Copy the data from the source sheet to the new sheet
+    cells_range_entidad = "A1:C1"
+    cells_range_empleado = "D1:G1"
+    cells_range_patron = "H1:N1"
+
+    # # Copy the data from the source sheet to the new sheet
     copy_data_from_existing_sheet(source_sheet, sheet1)
+    
+    sheet1.merge_cells(cells_range_entidad)
+    sheet1.merge_cells(cells_range_empleado)
+    sheet1.merge_cells(cells_range_patron)
+
+    merged_ranges = [cells_range_entidad, cells_range_empleado, cells_range_patron]
+
+    # Set alignment for merged cells
+    for merged_range in merged_ranges:
+        start_cell, end_cell = merged_range.split(":")
+        start_row, start_column = openpyxl.utils.coordinate_to_tuple(start_cell)
+        end_row, end_column = openpyxl.utils.coordinate_to_tuple(end_cell)
+        
+        for row in range(start_row, end_row + 1):
+            for column in range(start_column, end_column + 1):
+                cell = sheet1.cell(row=row, column=column)
+                cell.alignment = center_alignment
+                cell.font = bold_font
 
     # Assign the desired name to the sheet
     sheet_name = f"Datos-{year}-{month}"
@@ -48,23 +62,35 @@ def generate_excel_report_consolidado(data, year, month):
 
     return response
 
-def copy_data_from_existing_sheet(source_sheet, target_sheet):
-    # Read the data from the original sheet and copy it to the new sheet
-    for row in source_sheet.iter_rows(values_only=True):
-        target_sheet.append(row)
-
 def get_data_values(date):
-    
     empleados = valoresEmpleado.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    empleados_ordenados = sorted(empleados, key=lambda empleado: orden_personalizado.index(empleado.NIT.razonEntidad))
+    empleados_ordenados = sorted(
+        empleados, key=lambda empleado: PERSONALIZED_ORDER.index(empleado.NIT.razonEntidad)
+    )
 
     patrones = valoresPatron.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    patrones_ordenados = sorted(patrones, key=lambda patron: orden_personalizado.index(patron.NIT.razonEntidad))
+    patrones_ordenados = sorted(
+        patrones, key=lambda patron: PERSONALIZED_ORDER.index(patron.NIT.razonEntidad)
+    )
+
+    # Create a dictionary to map entity names to indices
+    entidad_to_index = {entidad: index for index, entidad in enumerate(PERSONALIZED_ORDER)}
+    
+    # Get the filtered objects and assign them order values
+    valores_planilla_ordenados = valoresPlanilla.objects.filter(
+        numeroPlanilla__fecha=date
+    ).annotate(
+        entidad_order=Case(
+            *[When(codigoEntidad__concepto=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
+            default=Value(len(PERSONALIZED_ORDER)), output_field=CharField()
+        )
+    ).order_by('entidad_order')
 
     # Create a dictionary to store the information grouped by NIT
     data = {
         'Valores patron':patrones_ordenados,
-        'Valores empleado':empleados_ordenados
+        'Valores empleado':empleados_ordenados,
+        'Valores planilla': valores_planilla_ordenados
     }
    
     return data
@@ -146,14 +172,36 @@ def process_data_patron(data):
 
     return data_dict
 
-def merger_data_consolidado(data_empleadores, data_patron):
+def process_data_planilla(data):
+    # Create a dictionary to store the information grouped by NIT
+    data_dict = {}
+    for planilla in data:
+
+        NIT = planilla.NIT
+        concepto = planilla.codigoEntidad.concepto
+        valor = planilla.valorPagar
+
+        # Check if an entry for the NIT already exists in the dictionary
+        if NIT not in data_dict:
+            data_dict[NIT] = {
+                'RAZON':concepto,
+                'VALOR': valor,                
+            }
+        else:
+            # If an entry for the NIT already exists, accumulate the value
+            data_dict[NIT]['VALOR'] += valor
+    
+    return data_dict
+
+def merger_data_consolidado(data_empleadores, data_patron, data_planilla):
     empleado = process_data_empleados(data_empleadores)
     patron = process_data_patron(data_patron)
-
-    # Crear un nuevo diccionario para almacenar la información combinada agrupada por NIT
+    planilla = process_data_planilla(data_planilla)
+    
+    # Create a new dictionary to store the combined information grouped by NIT
     new_dictionary = {}
 
-    # Combinar la información de los diccionarios 'empleado' y 'patron'
+    # Combine the information from the 'employee' and 'employer' dictionaries
     for nit, datos in empleado.items():
         if nit not in new_dictionary:
             new_dictionary[nit] = {}
@@ -164,90 +212,95 @@ def merger_data_consolidado(data_empleadores, data_patron):
             new_dictionary[nit] = {}
         new_dictionary[nit]['patron'] = datos      
 
+    for nit, datos in planilla.items():
+        if nit not in new_dictionary:
+            new_dictionary[nit] = {}
+        new_dictionary[nit]['planilla'] = datos      
+    
     return new_dictionary
 
 def save_data(sheet,data):
-    merge_data = merger_data_consolidado(data['Valores empleado'], data['Valores patron'])
-    
+    merge_data = merger_data_consolidado(data['Valores empleado'], data['Valores patron'], data['Valores planilla'])
+
     # Variable to track the current row number in the excel sheet
     current_row = 3
-    sum_empleado_un2 = 0
-    sum_empleado_un8 = 0
-    sum_empleado_un9 = 0
-    total_empleado = 0
-    sum_patron_temp2 = 0
-    sum_patron_temp8 = 0
-    sum_patron_temp9 = 0
-    sum_patron_perm2 = 0
-    sum_patron_perm8 = 0
-    sum_patron_perm9 = 0
-    total_patron = 0
-    total = 0
-
-    currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
+    sum_data = [0] * 13
+    suma_empleado_patron = 0
 
     for nit, item in merge_data.items():
         entidad = Entidad.objects.filter(NIT=nit).first()
-
-        sum_empleado_un2 += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2'))      
-        sum_empleado_un8 += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))      
-        sum_empleado_un9 += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9'))      
-        total_empleado += convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
-        sum_patron_temp2 += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
-        sum_patron_temp8 += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
-        sum_patron_temp9 += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9')) 
-        sum_patron_perm2 += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2'))
-        sum_patron_perm8 += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8'))
-        sum_patron_perm9 += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9'))
-        total_patron += convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
-        total = total_empleado + total_patron
-
+        suma_empleado_patron = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL')) + convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
+        
+        # Accumulate items
+        sum_data[0] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2'))      
+        sum_data[1] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))      
+        sum_data[2] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9'))      
+        sum_data[3] += convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
+        sum_data[4] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
+        sum_data[5] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
+        sum_data[6] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9')) 
+        sum_data[7] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2'))
+        sum_data[8] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8'))
+        sum_data[9] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9'))
+        sum_data[10] += convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
+        sum_data[11] = suma_empleado_patron
+        sum_data[12] += convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
+    
         sheet[f"A{current_row}"] = entidad.NIT
         sheet[f"B{current_row}"] = entidad.rubro
         sheet[f"C{current_row}"] = entidad.concepto
         sheet[f"D{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2')) 
-        sheet[f"D{current_row}"].style = currency_style
-        sheet[f"E{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8')) 
-        sheet[f"E{current_row}"].style = currency_style
+        sheet[f"E{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))        
         sheet[f"F{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9')) 
-        sheet[f"F{current_row}"].style = currency_style
         sheet[f"G{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
-        sheet[f"G{current_row}"].style = currency_style
         sheet[f"H{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
-        sheet[f"H{current_row}"].style = currency_style
         sheet[f"I{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
-        sheet[f"I{current_row}"].style = currency_style
         sheet[f"J{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9'))
-        sheet[f"J{current_row}"].style = currency_style
         sheet[f"K{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2')) 
-        sheet[f"K{current_row}"].style = currency_style
         sheet[f"L{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8')) 
-        sheet[f"L{current_row}"].style = currency_style
         sheet[f"M{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9')) 
-        sheet[f"M{current_row}"].style = currency_style
         sheet[f"N{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TOTAL')) 
+        sheet[f"O{current_row}"] = sum_data[11]
+        sheet[f"P{current_row}"] = convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
+
+        # Add format styles 
+        sheet[f"D{current_row}"].style = currency_style
+        sheet[f"E{current_row}"].style = currency_style
+        sheet[f"F{current_row}"].style = currency_style
+        sheet[f"G{current_row}"].style = currency_style
+        sheet[f"H{current_row}"].style = currency_style
+        sheet[f"I{current_row}"].style = currency_style
+        sheet[f"J{current_row}"].style = currency_style
+        sheet[f"K{current_row}"].style = currency_style
+        sheet[f"L{current_row}"].style = currency_style
+        sheet[f"M{current_row}"].style = currency_style
         sheet[f"N{current_row}"].style = currency_style
-        sheet[f"O{current_row}"] = total
         sheet[f"O{current_row}"].style = currency_style
+        sheet[f"P{current_row}"].style = currency_style
 
         # Increment the current row number for the next iteration
         current_row += 1
-    
+    add_totales(sheet, sum_data, current_row)
+            
+def add_totales(sheet, data, current_row):
+    suma_empleado_patron = data[3] + data[10]
     total_data = [
         "",
-        "",
+        "A0102..",
         "TOTAL",
-        sum_empleado_un2,
-        sum_empleado_un8,
-        sum_empleado_un9,
-        total_empleado,
-        sum_patron_temp2,
-        sum_patron_temp8,
-        sum_patron_temp9,
-        sum_patron_perm2,
-        sum_patron_perm8,
-        sum_patron_perm9,
-        total_patron,
+        data[0],
+        data[1],
+        data[2],
+        data[3],
+        data[4],
+        data[5],
+        data[6],
+        data[7],
+        data[8],
+        data[9],
+        data[10],
+        suma_empleado_patron,
+        data[12],
     ]
 
     additional_row_index = current_row 
@@ -255,6 +308,5 @@ def save_data(sheet,data):
         cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
         if isinstance(value, (int, float)):
             cell.style = currency_style
-     
-
+        cell.font = bold_font
 

@@ -133,7 +133,6 @@ def write_values_planilla_data(sheet, values_planilla):
         suma_total = 0
 
         for planilla in values_planilla_filtered: 
-            print(planilla.codigoEntidad.codigo)
             suma_num_afiliados += planilla.numeroAfiliados
             suma_fondo_solidaridad += planilla.fondoSolidaridad
             suma_fondo_subsistencia += planilla.fondoSubsistencia

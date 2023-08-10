@@ -23,7 +23,7 @@ class Gasto(models.Model):
         return f"Tipo: {self.tipo}"
 
 class Entidad(models.Model):
-    codigo = models.CharField(max_length=50,primary_key=True,default = 'COD')
+    codigo = models.CharField(max_length=50, primary_key=True, default = 'COD')
     NIT = models.CharField(max_length=50)
     idTipoGasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
     concepto = models.CharField(max_length=100)

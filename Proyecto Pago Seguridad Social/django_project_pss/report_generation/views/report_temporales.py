@@ -2,21 +2,13 @@ import openpyxl
 from django.http import HttpResponse
 
 from document_upload.models import *
+from .constants import *
+from .functions import *
 
 def get_data_temporales(date):
-    orden_personalizado = [
-        'SALUD',
-        'RIESGOS PROFESIONALES',
-        'PENSION',
-        'MEN',
-        'SENA',
-        'ESAP',
-        'ICBF',
-        'CAJA DE COMPENSACION FAMILIAR',
-    ]
     # Filtrar por tipoPatronal permanente y fecha
     motivos = valoresPatron.objects.filter(tipoPatronal__tipo='temporal', fecha=date).order_by('NIT__razonEntidad')
-    motivos_ordenados = sorted(motivos, key=lambda motivo: orden_personalizado.index(motivo.NIT.razonEntidad))
+    motivos_ordenados = sorted(motivos, key=lambda motivo: PERSONALIZED_ORDER.index(motivo.NIT.razonEntidad))
 
     return motivos_ordenados
 
@@ -84,6 +76,12 @@ def write_temporales_data(sheet, data):
         sheet[f"H{index}"] = motivo.unidad9
         sheet[f"I{index}"] = motivo.total
 
+        # Add styles to the cells
+        sheet[f"F{index}"].style = currency_style 
+        sheet[f"G{index}"].style = currency_style 
+        sheet[f"H{index}"].style = currency_style 
+        sheet[f"I{index}"].style = currency_style 
+
 
     total_data = [
         "supernume",  
@@ -99,4 +97,7 @@ def write_temporales_data(sheet, data):
 
     additional_row_index = len(data) + 2 
     for col_idx, value in enumerate(total_data, start=1):
-        sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
+        if col_idx > 4:
+            cell.style = currency_style
+        cell.font = bold_font

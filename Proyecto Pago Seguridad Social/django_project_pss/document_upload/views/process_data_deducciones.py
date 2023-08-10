@@ -3,7 +3,6 @@ from django.db.models import Q
 from ..models import *
 from .process_data import *
 
-
 def extract_data_deducciones(csv_file_path, year, month,unidad):
     clean_data_deducciones(csv_file_path)
     data = read_data_from_csv(csv_file_path)
@@ -52,10 +51,11 @@ def calculate_accumulated_balance(data):
 
 def get_entidad_instance(nit):       
     try:
-        entidad_instace = Entidad.objects.get(NIT=nit)
+        # entidad_instace = Entidad.objects.get(NIT=nit)
+        entidad_instace = Entidad.objects.filter(NIT=nit).first()
         razones_entidad_filtrar = ['SALUD', 'RIESGOS PROFESIONALES', 'PENSION']
-        if entidad_instace.razonEntidad in razones_entidad_filtrar:
-            print(entidad_instace)
+
+        if (entidad_instace != None) and (entidad_instace.razonEntidad in razones_entidad_filtrar):
             return entidad_instace
         else:
             return None  
@@ -73,7 +73,7 @@ def save_data_to_valores_empleado(data, unidad, year=None, month=None):
         num_doc = values[1]
 
         entidad_instance = get_entidad_instance(nit)
-
+        
         if not entidad_instance:
             continue
         

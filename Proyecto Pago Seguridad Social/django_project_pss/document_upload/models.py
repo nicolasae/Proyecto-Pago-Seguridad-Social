@@ -23,8 +23,8 @@ class Gasto(models.Model):
         return f"Tipo: {self.tipo}"
 
 class Entidad(models.Model):
-    NIT = models.CharField(max_length=50, primary_key=True, unique=True)
-    codigo = models.CharField(max_length=100,default = 'COD')
+    codigo = models.CharField(max_length=50,primary_key=True,default = 'COD')
+    NIT = models.CharField(max_length=50)
     idTipoGasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
     concepto = models.CharField(max_length=100)
     razonEntidad = models.CharField(max_length=100)
@@ -33,7 +33,45 @@ class Entidad(models.Model):
     codigoDescuento = models.CharField(max_length=100, default = 'COD')
 
     def __str__(self):
-        return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad}"
+        return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad} -Codigo:{self.codigo}"
+   
+class infoPlanilla(models.Model):
+    numeroPlanilla = models.CharField(max_length=100, primary_key=True)
+    razonSocial = models.CharField(max_length=100, default="Rama Judicial")
+    fecha = models.CharField(max_length=10,default='2023/06')
+    identificacion = models.CharField(max_length=100)
+    codigoDependenciaSucursal = models.CharField(max_length=100)
+    nomDependenciaSucursal = models.CharField(max_length=100)
+    fechaReporte = models.DateField()
+    fechaLimitePago = models.DateField()
+    periodoPension = models.CharField(max_length=7)
+    periodoSalud = models.CharField(max_length=7)
+    totalCotizantes = models.IntegerField()
+    PIN = models.CharField(max_length=100)
+    tipoPlanilla = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Fecha reporte: {self.fecha} - Número planilla: {self.numeroPlanilla}"
+    
+class valoresPlanilla(models.Model):
+    # codigoEntidad = models.CharField(max_length=50)
+    # NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
+    codigoEntidad = models.ForeignKey(Entidad,on_delete=models.CASCADE)
+    NIT = models.CharField(max_length=50)
+    numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
+    numeroAfiliados = models.IntegerField()
+    fondoSolidaridad = models.IntegerField(default=0)
+    fondoSubsistencia = models.IntegerField(default=0)
+    totalIntereses = models.IntegerField(default=0)
+    valorPagarSinIntereses = models.IntegerField(default=0)
+    valorPagar = models.IntegerField(default=0)
+
+    class Meta:
+        # Definir la combinación de campos que debe ser única
+        unique_together = ('numeroPlanilla', 'codigoEntidad',)
+
+    def __str__(self):
+        return  f"{self.numeroPlanilla} - NIT:{self.NIT} - Valor a Pagar: {self.valorPagar}"
     
 class valoresPatron(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
@@ -64,39 +102,3 @@ class valoresEmpleado(models.Model):
 
     def __str__(self):
         return f"{self.NIT} - Unidad: {self.unidad}"
-
-class infoPlanilla(models.Model):
-    numeroPlanilla = models.CharField(max_length=100, primary_key=True)
-    razonSocial = models.CharField(max_length=100, default="Rama Judicial")
-    fecha = models.CharField(max_length=10,default='2023/06')
-    identificacion = models.CharField(max_length=100)
-    codigoDependenciaSucursal = models.CharField(max_length=100)
-    nomDependenciaSucursal = models.CharField(max_length=100)
-    fechaReporte = models.DateField()
-    fechaLimitePago = models.DateField()
-    periodoPension = models.CharField(max_length=7)
-    periodoSalud = models.CharField(max_length=7)
-    totalCotizantes = models.IntegerField()
-    PIN = models.CharField(max_length=100)
-    tipoPlanilla = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"Fecha reporte: {self.fecha} - Número planilla: {self.numeroPlanilla}"
-    
-class valoresPlanilla(models.Model):
-    codigoEntidad = models.CharField(max_length=100)
-    NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
-    numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
-    numeroAfiliados = models.IntegerField()
-    fondoSolidaridad = models.IntegerField(default=0)
-    fondoSubsistencia = models.IntegerField(default=0)
-    totalIntereses = models.IntegerField(default=0)
-    valorPagarSinIntereses = models.IntegerField(default=0)
-    valorPagar = models.IntegerField(default=0)
-
-    class Meta:
-        # Definir la combinación de campos que debe ser única
-        unique_together = ('numeroPlanilla', 'codigoEntidad',)
-
-    def __str__(self):
-        return  f"{self.numeroPlanilla} - {self.NIT} - Valor a Pagar: {self.valorPagar}"

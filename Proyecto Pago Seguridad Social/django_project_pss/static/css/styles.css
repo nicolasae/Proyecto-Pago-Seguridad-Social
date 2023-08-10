@@ -17,7 +17,7 @@
 .cuerpo-contenido {
     max-width: 1920px;
     margin: 0 auto;
-    padding: 5px;
+    padding: 20px;
 }
 .cuerpo-contenido a {
     text-decoration: none;
@@ -88,6 +88,11 @@ button.btn-outline-local {
 
 .logo {
     height: 54px;
+}
+
+.boton-centrado {
+    display: flex;
+    justify-content: center;
 }
 
 @media (min-width: 768px) {

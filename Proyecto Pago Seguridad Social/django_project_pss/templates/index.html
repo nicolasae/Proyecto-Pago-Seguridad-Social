@@ -10,22 +10,25 @@
         {% include "navbar.html" %} 
     </section>
 
-    <main class="cuerpo-contenido">       
+    <main class="cuerpo-contenido">           
         <div class="row justify-content-center">
-            <div class="col-md-6 mt-5">
-                <div class="card">
-                    <div class="image-container">
-                        <img src="{% static 'images/logo_rama_judicial.png' %}" class="card-img-top" alt="Logo Rama Judicial">
-                    </div>
-                    <div class="card-body text-center mt-5">
-                        <div class="d-flex justify-content-center">
+            <div class="col-12">
+                <div class="image-container">
+                    <img src="{% static 'images/logo_rama_judicial.png' %}" class="card-img-top" alt="Logo Rama Judicial">
+                </div>
+                <div class="text-center mt-5 mt-sm-3">
+                    <div class="d-flex row justify-content-center btn-group mt-5">
+                        
+                        <div class="d-flex col-12 col-sm-6 justify-content-center justify-content-md-end">
                             <a href="/documentos">
                                 <button type="button" class="btn-outline-local">
                                     <i class="bi bi-journals"></i>
                                     Documentos
                                 </button>
                             </a>
+                        </div>
 
+                        <div class="d-flex col-12 col-sm-6 justify-content-center justify-content-md-start">
                             <a href="/admin">
                                 <button type="button" class="btn-outline-local">
                                     <i class="bi bi-door-open"></i>
@@ -35,6 +38,7 @@
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </main>

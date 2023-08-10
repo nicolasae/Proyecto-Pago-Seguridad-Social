@@ -44,39 +44,45 @@ def save_db_info_planilla(data,year=None,month=None):
     
 def save_db_values_planilla(info_planilla_data, values_planilla_data):
     numeroPlanilla = info_planilla_data[8][1]
-
     for array in values_planilla_data[1:]:
         if len(array) >= 9:
-            codigoEntidad = array[0]
+            codigo_entidad = array[0]
             valor_total = array[6] + array[7]
-            # Verificar si el registro ya existe
+                              
             try:
-                values_planilla = valoresPlanilla.objects.get(
-                    codigoEntidad = codigoEntidad,
-                    numeroPlanilla__numeroPlanilla = numeroPlanilla
-                )
-            except valoresPlanilla.DoesNotExist:
-                # Si no existe, crear uno nuevo
-                values_planilla = valoresPlanilla(
-                    codigoEntidad=codigoEntidad,
-                    NIT=Entidad.objects.get(NIT=array[1]),
-                    numeroPlanilla=infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla),
-                    numeroAfiliados=array[3],
-                    fondoSolidaridad=array[4],
-                    fondoSubsistencia=array[5],
-                    totalIntereses=array[6],
-                    valorPagarSinIntereses=array[7],
-                    valorPagar=valor_total, 
-                )
-            else:
-                # Si existe, actualizar los valores
-                values_planilla.NIT = Entidad.objects.get(NIT=array[1])
-                values_planilla.numeroAfiliados = array[3]
-                values_planilla.fondoSolidaridad = array[4]
-                values_planilla.fondoSubsistencia = array[5]
-                values_planilla.totalIntereses = array[6]
-                values_planilla.valorPagarSinIntereses = array[7]
-                values_planilla.valorPagar = valor_total
+                planilla_instance = infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla)
+            except infoPlanilla.DoesNotExist:
+                # print(f"Error: No infoPlanilla instance found with number '{numeroPlanilla}'")
+                return
 
-            # Guardar el registro
-            values_planilla.save()
+            try:
+                entidad_instance = Entidad.objects.get(codigo=codigo_entidad)
+            except Entidad.DoesNotExist:
+                # print(f"Warning: No Entidad instance found with codigo '{codigo_entidad}'")
+                continue
+
+            valores_planilla_instance, created = valoresPlanilla.objects.get_or_create(
+                numeroPlanilla=planilla_instance,
+                codigoEntidad=entidad_instance,
+                defaults={
+                    'NIT': array[1],
+                    'numeroAfiliados': array[3],
+                    'fondoSolidaridad': array[4],
+                    'fondoSubsistencia': array[5],
+                    'totalIntereses': array[6],
+                    'valorPagarSinIntereses': array[7],
+                    'valorPagar': valor_total,
+                }
+            )
+
+            if not created:
+                valores_planilla_instance.NIT = array[1]
+                valores_planilla_instance.numeroAfiliados = array[3]
+                valores_planilla_instance.fondoSolidaridad = array[4]
+                valores_planilla_instance.fondoSubsistencia = array[5]
+                valores_planilla_instance.totalIntereses = array[6]
+                valores_planilla_instance.valorPagarSinIntereses = array[7]
+                valores_planilla_instance.valorPagar = valor_total
+                valores_planilla_instance.save()
+            else:
+                print(f"Created new valoresPlanilla: {valores_planilla_instance}")

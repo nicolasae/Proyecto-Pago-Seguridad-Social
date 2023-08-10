@@ -54,8 +54,6 @@ class infoPlanilla(models.Model):
         return f"Fecha reporte: {self.fecha} - Número planilla: {self.numeroPlanilla}"
     
 class valoresPlanilla(models.Model):
-    # codigoEntidad = models.CharField(max_length=50)
-    # NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     codigoEntidad = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     NIT = models.CharField(max_length=50)
     numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)

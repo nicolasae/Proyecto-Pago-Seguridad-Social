@@ -1,21 +1,11 @@
 import openpyxl
-from openpyxl.styles import Font, Alignment, NamedStyle
 
 from django.http import HttpResponse
 from django.db.models import Sum,Case, CharField, Value, When
 
 from document_upload.models import *
-
-personalized_order = [
-    'SALUD',
-    'RIESGOS PROFESIONALES',
-    'PENSION',
-    'MEN',
-    'SENA',
-    'ESAP',
-    'ICBF',
-    'CAJA DE COMPENSACION FAMILIAR',
-]
+from .functions import *
+from .constants import *
 
 # Map model fields to the headers in the Excel file
 field_mapping = {
@@ -34,12 +24,6 @@ field_mapping = {
     'tipoPlanilla': 'TIPO DE PLANILLA',
 }
 
-# Styles
-bold_font = Font(bold=True)
-left_alignment = Alignment(horizontal='left')
-currency_style = NamedStyle(name='currency_style', number_format='"$"#,##0')
-
-
 def get_info_planilla(date):   
     # Get the datasheet objects filtered by year and month
     info_planilla = infoPlanilla.objects.filter(fecha=date)
@@ -47,15 +31,15 @@ def get_info_planilla(date):
 
 def get_values_planilla(date):    
     # Create a dictionary to map entity names to indices
-    entidad_to_index = {entidad: index for index, entidad in enumerate(personalized_order)}
+    entidad_to_index = {entidad: index for index, entidad in enumerate(PERSONALIZED_ORDER)}
     
     # Get the filtered objects and assign them order values
     valores_planilla_filtrados = valoresPlanilla.objects.filter(
         numeroPlanilla__fecha=date
     ).annotate(
         entidad_order=Case(
-            *[When(NIT__razonEntidad=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
-            default=Value(len(personalized_order)), output_field=CharField()
+            *[When(codigoEntidad__concepto=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
+            default=Value(len(PERSONALIZED_ORDER)), output_field=CharField()
         )
     ).order_by('entidad_order')
 
@@ -131,7 +115,7 @@ def write_values_planilla_data(sheet, values_planilla):
     
     distinct_razon_entidades_ordered = sorted(
         distinct_razon_entidades,
-        key=lambda entidad: personalized_order.index(entidad) if entidad in personalized_order else len(personalized_order)
+        key=lambda entidad: PERSONALIZED_ORDER.index(entidad) if entidad in PERSONALIZED_ORDER else len(PERSONALIZED_ORDER)
     )
 
     # Initialize row_index for the first group
@@ -139,7 +123,7 @@ def write_values_planilla_data(sheet, values_planilla):
 
     for razon_entidad in distinct_razon_entidades_ordered:
         # Filter values_planilla for the current razon_entidad
-        values_planilla_filtered = values_planilla.filter(NIT__razonEntidad=razon_entidad)
+        values_planilla_filtered = values_planilla.filter(codigoEntidad__razonEntidad=razon_entidad)
 
         suma_num_afiliados = 0
         suma_fondo_solidaridad = 0
@@ -149,6 +133,7 @@ def write_values_planilla_data(sheet, values_planilla):
         suma_total = 0
 
         for planilla in values_planilla_filtered: 
+            print(planilla.codigoEntidad.codigo)
             suma_num_afiliados += planilla.numeroAfiliados
             suma_fondo_solidaridad += planilla.fondoSolidaridad
             suma_fondo_subsistencia += planilla.fondoSubsistencia
@@ -156,9 +141,9 @@ def write_values_planilla_data(sheet, values_planilla):
             suma_sin_intereses += planilla.valorPagarSinIntereses
             suma_total += planilla.valorPagar
 
-            sheet[f"A{row_index}"] = planilla.NIT.codigo
-            sheet[f"B{row_index}"] = planilla.NIT_id
-            sheet[f"C{row_index}"] = planilla.NIT.concepto
+            sheet[f"A{row_index}"] = planilla.codigoEntidad.codigo
+            sheet[f"B{row_index}"] = planilla.NIT
+            sheet[f"C{row_index}"] = planilla.codigoEntidad.concepto
             sheet[f"D{row_index}"] = planilla.numeroAfiliados
             sheet[f"E{row_index}"] = planilla.fondoSolidaridad
             sheet[f"F{row_index}"] = planilla.fondoSubsistencia

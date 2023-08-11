@@ -31,6 +31,7 @@ class Entidad(models.Model):
     rubro = models.CharField(max_length=100)
     tipoCuentaPagar = models.CharField(max_length=100)
     codigoDescuento = models.CharField(max_length=100, default = 'COD')
+    tipo = models.CharField(max_length=100,default='tipo')
 
     def __str__(self):
         return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad} -Codigo:{self.codigo}"

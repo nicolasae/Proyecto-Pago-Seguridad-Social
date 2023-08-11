@@ -11,6 +11,7 @@ def process_entidad_row(row):
         entidad_instance.rubro = row[5]
         entidad_instance.tipoCuentaPagar = row[6]
         entidad_instance.codigoDescuento = row[7]
+        entidad_instance.codigoDescuento = row[8]
         entidad_instance.save()
         print(f"Updated existing Entidad: {entidad_instance}")
     except Entidad.DoesNotExist:
@@ -31,6 +32,7 @@ def process_entidad_row(row):
             razonEntidad=row[4],
             rubro=row[5],
             tipoCuentaPagar=row[6],
-            codigoDescuento=row[7]
+            codigoDescuento=row[7],
+            tipo=row[8]
         )
         entidad.save()

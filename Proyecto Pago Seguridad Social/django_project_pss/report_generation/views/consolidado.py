@@ -4,6 +4,7 @@ from openpyxl.utils import get_column_letter
 
 from django.http import HttpResponse
 from django.db.models import Sum,Case, CharField, Value, When
+from django.core.exceptions import ObjectDoesNotExist
 from document_upload.models import *
 from .functions import *
 from .constants import *
@@ -63,37 +64,45 @@ def generate_excel_report_consolidado(data, year, month):
     return response
 
 def get_data_values(date):
-    empleados = valoresEmpleado.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    empleados_ordenados = sorted(
-        empleados, key=lambda empleado: PERSONALIZED_ORDER.index(empleado.NIT.razonEntidad)
-    )
-
-    patrones = valoresPatron.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-    patrones_ordenados = sorted(
-        patrones, key=lambda patron: PERSONALIZED_ORDER.index(patron.NIT.razonEntidad)
-    )
-
-    # Create a dictionary to map entity names to indices
-    entidad_to_index = {entidad: index for index, entidad in enumerate(PERSONALIZED_ORDER)}
-    
-    # Get the filtered objects and assign them order values
-    valores_planilla_ordenados = valoresPlanilla.objects.filter(
-        numeroPlanilla__fecha=date
-    ).annotate(
-        entidad_order=Case(
-            *[When(codigoEntidad__concepto=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
-            default=Value(len(PERSONALIZED_ORDER)), output_field=CharField()
+    try:
+        empleados = valoresEmpleado.objects.filter(fecha=date).order_by('NIT__razonEntidad')
+        empleados_ordenados = sorted(
+            empleados, key=lambda empleado: PERSONALIZED_ORDER.index(empleado.NIT.razonEntidad)
         )
-    ).order_by('entidad_order')
 
-    # Create a dictionary to store the information grouped by NIT
-    data = {
-        'Valores patron':patrones_ordenados,
-        'Valores empleado':empleados_ordenados,
-        'Valores planilla': valores_planilla_ordenados
-    }
-   
-    return data
+        patrones = valoresPatron.objects.filter(fecha=date).order_by('NIT__razonEntidad')
+        patrones_ordenados = sorted(
+            patrones, key=lambda patron: PERSONALIZED_ORDER.index(patron.NIT.razonEntidad)
+        )
+
+        # Create a dictionary to map entity names to indices
+        entidad_to_index = {entidad: index for index, entidad in enumerate(PERSONALIZED_ORDER)}
+        
+        # Get the filtered objects and assign them order values
+        valores_planilla_ordenados = valoresPlanilla.objects.filter(
+            numeroPlanilla__fecha=date
+        ).annotate(
+            entidad_order=Case(
+                *[When(codigoEntidad__concepto=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
+                default=Value(len(PERSONALIZED_ORDER)), output_field=CharField()
+            )
+        ).order_by('entidad_order')
+
+        # Create a dictionary to store the information grouped by NIT
+        data = {
+            'Valores patron':patrones_ordenados,
+            'Valores empleado':empleados_ordenados,
+            'Valores planilla': valores_planilla_ordenados
+        }
+    
+        return data
+    
+    except ObjectDoesNotExist:
+        return None  # Return None if there's no data for the given date or any other related error
+    except Exception as e:
+        # Handle other exceptions as needed, such as database errors, unexpected behavior, etc.
+        print(f"An error occurred: {e}")
+        return None
 
 def process_data_empleados(data):
     # Create a dictionary to store the information grouped by NIT
@@ -224,27 +233,47 @@ def save_data(sheet,data):
 
     # Variable to track the current row number in the excel sheet
     current_row = 3
-    sum_data = [0] * 13
     suma_empleado_patron = 0
+    total_pago = 0
+    current_tipo_entidad = None
+    sum_subtotales = [0] * 13
+    sum_totales = [0] * 13
 
     for nit, item in merge_data.items():
         entidad = Entidad.objects.filter(NIT=nit).first()
         suma_empleado_patron = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL')) + convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
+
+        if entidad.tipo != current_tipo_entidad:  
+            if current_tipo_entidad is not None:
+                add_subtotal(sheet, sum_subtotales, current_row, current_tipo_entidad)
+                current_row += 1
+           
+            current_tipo_entidad = entidad.tipo
+            for i in range(len(sum_subtotales)):
+                if (i == 12):
+                    sum_totales[i] = sum_subtotales[i]
+                else:
+                    sum_totales[i] += sum_subtotales[i]
+
+            for i in range(12):
+                sum_subtotales[i] = 0
+        
+        total_pago += suma_empleado_patron
         
         # Accumulate items
-        sum_data[0] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2'))      
-        sum_data[1] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))      
-        sum_data[2] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9'))      
-        sum_data[3] += convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
-        sum_data[4] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
-        sum_data[5] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
-        sum_data[6] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9')) 
-        sum_data[7] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2'))
-        sum_data[8] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8'))
-        sum_data[9] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9'))
-        sum_data[10] += convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
-        sum_data[11] = suma_empleado_patron
-        sum_data[12] += convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
+        sum_subtotales[0] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2'))      
+        sum_subtotales[1] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))      
+        sum_subtotales[2] += convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9'))      
+        sum_subtotales[3] += convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
+        sum_subtotales[4] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
+        sum_subtotales[5] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
+        sum_subtotales[6] += convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9')) 
+        sum_subtotales[7] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2'))
+        sum_subtotales[8] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8'))
+        sum_subtotales[9] += convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9'))
+        sum_subtotales[10] += convert_empty_to_zero(item.get('patron', {}).get('TOTAL'))
+        sum_subtotales[11] = suma_empleado_patron
+        sum_subtotales[12] += convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
     
         sheet[f"A{current_row}"] = entidad.NIT
         sheet[f"B{current_row}"] = entidad.rubro
@@ -260,7 +289,7 @@ def save_data(sheet,data):
         sheet[f"L{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8')) 
         sheet[f"M{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9')) 
         sheet[f"N{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TOTAL')) 
-        sheet[f"O{current_row}"] = sum_data[11]
+        sheet[f"O{current_row}"] = sum_subtotales[11]
         sheet[f"P{current_row}"] = convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
 
         # Add format styles 
@@ -280,10 +309,41 @@ def save_data(sheet,data):
 
         # Increment the current row number for the next iteration
         current_row += 1
-    add_totales(sheet, sum_data, current_row)
-            
+
+        sum_subtotales[11] = total_pago
+
+    if current_tipo_entidad is not None: 
+        add_subtotal(sheet, sum_subtotales, current_row, current_tipo_entidad)
+        current_row += 1
+        print('cantidad',sum_subtotales)
+        for i in range(len(sum_subtotales)):
+                if (i == 12):
+                    sum_totales[i] = sum_subtotales[i]
+                else:
+                    sum_totales[i] += sum_subtotales[i]
+
+    add_totales(sheet, sum_totales, current_row)
+    
+
+def add_subtotal(sheet, sum_subtotales, current_row, tipo_entidad):      
+    # Add the subtotal cells and apply the style
+    sheet[f"B{current_row}"] = "Subtotal"
+    sheet[f"C{current_row}"] = tipo_entidad
+    sheet[f"B{current_row}"].font = bold_font
+    sheet[f"C{current_row}"].font = bold_font
+    for col_index, value in enumerate(sum_subtotales):
+        col_letter = chr(ord('D') + col_index) 
+        print(col_letter)
+        if ( col_letter != 'P'):
+            sheet[f"{col_letter}{current_row}"] = value
+            sheet[f"{col_letter}{current_row}"].style = currency_style
+            sheet[f"{col_letter}{current_row}"].font = bold_font
+        else:
+            continue
+
 def add_totales(sheet, data, current_row):
     suma_empleado_patron = data[3] + data[10]
+
     total_data = [
         "",
         "A0102..",
@@ -310,3 +370,5 @@ def add_totales(sheet, data, current_row):
             cell.style = currency_style
         cell.font = bold_font
 
+
+        

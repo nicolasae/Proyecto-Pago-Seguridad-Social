@@ -118,9 +118,8 @@ def create_report_deducciones(request, year, month):
 def create_report_consolidado(request, year, month):
     date = year + '/' + month
     data = get_data_values(date)
-    # return generate_excel_report_consolidado(data,year,month)
-
-    if len(data) > 0:
+    
+    if data is not None and all(data.values()):
         return generate_excel_report_consolidado(data,year,month)
     else:
         context = {

@@ -9,9 +9,30 @@ from document_upload.models import *
 from ..functions import *
 from ..constants import *
 
+def get_list_entidades():    
+    # Get a list of dictionaries with unique NIT records
+    entidades_unicas = Entidad.objects.values('NIT').distinct()
+    
+    # Get the complete Entity objects for the unique NITs
+    entidades_completas = Entidad.objects.filter(NIT__in=[entidad['NIT'] for entidad in entidades_unicas])
+    entidades_ordenadas = sorted(entidades_completas, key=lambda entidad: PERSONALIZED_ORDER.index(entidad.razonEntidad))
+
+    return entidades_ordenadas
+
 def process_data_empleados(data):
+    entidades = get_list_entidades()
     # Create a dictionary to store the information grouped by NIT
     data_dict = {}
+    for entidad in entidades:
+        nit = entidad.NIT
+        data_dict[nit] = {
+            'RUBRO': entidad.rubro,
+            'CONCEPTO': entidad.concepto,
+            'UNIDAD 2': 0,
+            'UNIDAD 8': 0,
+            'UNIDAD 9': 0,
+            'TOTAL': 0
+        }
 
     for motivo in data:
         NIT = motivo.NIT.NIT
@@ -43,8 +64,25 @@ def process_data_empleados(data):
     return data_dict
 
 def process_data_patron(data):
+    entidades = get_list_entidades()
+    
     # Create a dictionary to store the information grouped by NIT
     data_dict = {}
+
+    for entidad in entidades:
+        nit = entidad.NIT
+        data_dict[nit] = {
+            'RUBRO': entidad.rubro,
+            'CONCEPTO': entidad.concepto,
+            'CODIGO DEL CONCEPTO DE DESCUENTO': entidad.codigoDescuento,
+            'TEMPORAL UN 2': 0,
+            'TEMPORAL UN 8': 0,
+            'TEMPORAL UN 9': 0,
+            'PERMANENTE UN 2': 0,
+            'PERMANENTE UN 8': 0,
+            'PERMANENTE UN 9': 0,
+            'TOTAL': 0
+        }
 
     for motivo in data:
         NIT = motivo.NIT.NIT
@@ -84,6 +122,7 @@ def process_data_patron(data):
 
         data_dict[NIT]['TOTAL'] += total
 
+    print(data_dict)
     return data_dict
 
 def process_data_planilla(data):
@@ -130,7 +169,7 @@ def merger_data_consolidado(data_empleadores, data_patron, data_planilla):
         if nit not in new_dictionary:
             new_dictionary[nit] = {}
         new_dictionary[nit]['planilla'] = datos      
-    
+            
     return new_dictionary
 
 def save_data(sheet,data):

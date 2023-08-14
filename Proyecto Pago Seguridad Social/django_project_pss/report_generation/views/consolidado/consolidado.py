@@ -198,19 +198,15 @@ def save_data(sheet,data):
         sheet[f"P{current_row}"] = convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
 
         # Add format styles 
-        sheet[f"D{current_row}"].style = currency_style
-        sheet[f"E{current_row}"].style = currency_style
-        sheet[f"F{current_row}"].style = currency_style
-        sheet[f"G{current_row}"].style = currency_style
-        sheet[f"H{current_row}"].style = currency_style
-        sheet[f"I{current_row}"].style = currency_style
-        sheet[f"J{current_row}"].style = currency_style
-        sheet[f"K{current_row}"].style = currency_style
-        sheet[f"L{current_row}"].style = currency_style
-        sheet[f"M{current_row}"].style = currency_style
-        sheet[f"N{current_row}"].style = currency_style
-        sheet[f"O{current_row}"].style = currency_style
-        sheet[f"P{current_row}"].style = currency_style
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K','L','M','N','O','P']
+
+        for col in columns_to_style:
+            cell = f"{col}{current_row}"
+
+            if col in ['D', 'E', 'F','G', 'H','I','J','K','L','M','N','O','P']:
+                sheet[cell].style = currency_style 
+            sheet[cell].font = font_style
+            sheet[cell].border = border_style
 
         # Increment the current row number for the next iteration
         current_row += 1
@@ -230,16 +226,21 @@ def save_data(sheet,data):
 
 def add_subtotal(sheet, sum_subtotales, current_row, tipo_entidad):      
     # Add the subtotal cells and apply the style
-    sheet[f"B{current_row}"] = "Subtotal"
+    sheet[f"B{current_row}"] = "SUBTOTAL"
     sheet[f"C{current_row}"] = tipo_entidad
-    # sheet[f"B{current_row}"].font = bold_font
-    # sheet[f"C{current_row}"].font = bold_font
+    
+    sheet[f"B{current_row}"].font = header_style
+    sheet[f"B{current_row}"].border = border_style
+    sheet[f"C{current_row}"].font = header_style
+    sheet[f"C{current_row}"].border = border_style
+
     for col_index, value in enumerate(sum_subtotales):
         col_letter = chr(ord('D') + col_index) 
         if ( col_letter != 'P'):
             sheet[f"{col_letter}{current_row}"] = value
             sheet[f"{col_letter}{current_row}"].style = currency_style
-            # sheet[f"{col_letter}{current_row}"].font = bold_font
+            sheet[f"{col_letter}{current_row}"].font = header_style
+            sheet[f"{col_letter}{current_row}"].border = border_style
         else:
             continue
 
@@ -247,7 +248,7 @@ def add_totales(sheet, data, current_row):
     suma_empleado_patron = data[3] + data[10]
 
     total_data = [
-        "",
+        "supernume",
         "A0102..",
         "TOTAL",
         data[0],
@@ -270,7 +271,8 @@ def add_totales(sheet, data, current_row):
         cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
         if isinstance(value, (int, float)):
             cell.style = currency_style
-        # cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
 
 
         

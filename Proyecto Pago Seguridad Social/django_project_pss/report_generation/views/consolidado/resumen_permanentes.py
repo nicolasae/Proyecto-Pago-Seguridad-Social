@@ -92,7 +92,6 @@ def save_data_permanentes(sheet, date):
         sheet[f"K{row_index}"] = data['unidad9']
 
         #  Add styles to the cells
-         #  Add styles to the cells
         columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K']
 
         for col in columns_to_style:

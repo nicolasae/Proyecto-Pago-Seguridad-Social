@@ -13,42 +13,32 @@ from .process_data_patronales import *
 from .process_data_deducciones import * 
 
 def upload_data_entidades(request):
-    if request.method == 'POST' and request.FILES.get('formFile'):
-        upload_file = request.FILES['formFile']
-        new_file_name = 'datos_entidades.xlsx'
-        path = os.path.join(settings.MEDIA_ROOT, new_file_name)
-        save_path = save_uploaded_file(upload_file, path)
-        show_alert = False
+    if request.method == 'POST':
+        if request.FILES.get('formFile'):
+            upload_file = request.FILES['formFile']
+            new_file_name = 'datos_entidades.xlsx'
+            path = os.path.join(settings.MEDIA_ROOT, new_file_name)
+            save_path = save_uploaded_file(upload_file, path)
+        
+            try:
+                workbook = openpyxl.load_workbook(save_path)
+                worksheet = workbook.active
+                last_row = worksheet.max_row
 
-        try:
-            workbook = openpyxl.load_workbook(save_path)
-            worksheet = workbook.active
-            last_row = worksheet.max_row
+                for row in worksheet.iter_rows(min_row=2, max_row=last_row, values_only=True):
+                    process_entidad_row(row)
 
-            context = {
-                'show_alert': True,
-                'alert_type':"success",
-                'message':'El archivo se ha procesado correctamente.',
-            }
+                # Success message
+                messages.success(request, "El archivo se ha procesado correctamente.")
+            except Exception as e:
+                # Error message
+                messages.error(request, f"Ocurrió un error al procesar el archivo: {str(e)}, Intentelo de nuevo más tarde")
+                print(f"Error processing the file: {str(e)}")
 
-            for row in worksheet.iter_rows(min_row=2, max_row=last_row, values_only=True):
-                process_entidad_row(row)
-
-            # You can perform more operations or redirect to a success page here
-            return render(request, 'load_data_entidades.html', context)
-
-        except Exception as e:
-            context = {
-                'show_alert': True,
-                'alert_type':"danger",
-                'message':'Ocurrió un error al procesar el archivo.',
-            }
-
-            # Error handling if something goes wrong while processing the file
-            print(f"Error processing the file: {str(e)}")
-
-            # You can add an error message in the response or redirect to an error page
-            return render(request, 'load_data_entidades.html', context)
+            return render(request, 'load_data_entidades.html')
+        else:
+            messages.error(request, "Por favor, seleccione un archivo para subir.")
+            return render(request, 'load_data_entidades.html')
 
     return render(request, 'load_data_entidades.html')
 

@@ -118,7 +118,7 @@ def generate_masivo_permanentes_sheet(source_sheet,workbook,date):
     sheet_archivos = workbook.create_sheet("RESUMEN MASIVO PERMANENTES")
 
     cells_range_1 = "A1:B1"
-    cells_range_2 = "C1:E1"
+    cells_range_2 = "C1:C1"
     cells_range_3 = "F1:K1"
 
     # Copy the data from the source sheet to the new sheet
@@ -140,7 +140,6 @@ def generate_masivo_permanentes_sheet(source_sheet,workbook,date):
             for column in range(start_column, end_column + 1):
                 cell = sheet_archivos.cell(row=row, column=column)
                 cell.alignment = center_alignment
-                # # cell.font = bold_font
 
     save_data_permanentes(sheet_archivos,date)
 

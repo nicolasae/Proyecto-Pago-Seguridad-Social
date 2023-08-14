@@ -92,9 +92,16 @@ def save_data_permanentes(sheet, date):
         sheet[f"K{row_index}"] = data['unidad9']
 
         #  Add styles to the cells
-        sheet[f"I{row_index}"].style = currency_style 
-        sheet[f"J{row_index}"].style = currency_style 
-        sheet[f"K{row_index}"].style = currency_style 
+         #  Add styles to the cells
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K']
+
+        for col in columns_to_style:
+            cell = f"{col}{row_index}"
+
+            if col in ['I', 'J', 'K']:
+                sheet[cell].style = currency_style 
+            sheet[cell].font = font_style
+            sheet[cell].border = border_style
 
         suma_unidad2 += data['unidad2']
         suma_unidad8 += data['unidad8']
@@ -121,7 +128,8 @@ def save_data_permanentes(sheet, date):
         cell = sheet.cell(row=row_index, column=col_idx, value=value)
         if col_idx > 4:
             cell.style = currency_style
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
 
 
   

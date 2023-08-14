@@ -4,7 +4,6 @@ from document_upload.models import *
 from .report_planilla import *
 from .report_patronales import *
 from .report_deducciones import *
-from .revision import *
 from .consolidado.main import *
 
 def download_view(request):
@@ -66,9 +65,6 @@ def create_report_patronales(request, year, month):
             'message':f'No hay información disponible de patronales para el periodo: {date}.',
         }        
         return render(request, 'reports.html', context)
-
-def create_revision(request, year, month):
-    return revision(request,year,month)
 
 def create_report_deducciones(request, year, month):
     date = year + '/' + month

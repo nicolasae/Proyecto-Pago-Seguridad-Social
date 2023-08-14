@@ -15,11 +15,13 @@ def get_number_planilla(date):
 def get_list_entidades():
     # Get a list of dictionaries with unique NIT records
     entidades_unicas = Entidad.objects.values('NIT').distinct()
-    
-    # Get the complete Entity objects for the unique NITs   
+
+    # Get the complete Entity objects for the unique NITs
     entidades_completas = Entidad.objects.filter(NIT__in=[entidad['NIT'] for entidad in entidades_unicas])
 
-    return entidades_completas
+    entidades_ordenadas = sorted(entidades_completas, key=lambda entidad: PERSONALIZED_ORDER.index(entidad.razonEntidad))
+
+    return entidades_ordenadas
 
 def get_data_temporales(date):
     # Filter by tipoPatronal temporal and date
@@ -90,9 +92,15 @@ def save_data_temporales(sheet, date):
         sheet[f"H{row_index}"] = data['unidad9']
 
         #  Add styles to the cells
-        sheet[f"F{row_index}"].style = currency_style 
-        sheet[f"G{row_index}"].style = currency_style 
-        sheet[f"H{row_index}"].style = currency_style 
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K']
+
+        for col in columns_to_style:
+            cell = f"{col}{row_index}"
+
+            if col in ['F', 'G', 'H']:
+                sheet[cell].style = currency_style 
+            sheet[cell].font = font_style
+            sheet[cell].border = border_style
 
         suma_unidad2 += data['unidad2']
         suma_unidad8 += data['unidad8']
@@ -119,7 +127,8 @@ def save_data_temporales(sheet, date):
         cell = sheet.cell(row=row_index, column=col_idx, value=value)
         if col_idx > 4:
             cell.style = currency_style
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
 
 
   

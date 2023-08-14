@@ -12,11 +12,11 @@ def get_number_planilla(date):
     
     return numero_planilla
 
-def get_list_entidades():
-    # Obtener una lista de diccionarios con los registros únicos de NIT
+def get_list_entidades():    
+    # Get a list of dictionaries with unique NIT records
     entidades_unicas = Entidad.objects.values('NIT').distinct()
-
-    # Obtener los objetos Entidad completos para los NIT únicos
+    
+    # Get the complete Entity objects for the unique NITs
     entidades_completas = Entidad.objects.filter(NIT__in=[entidad['NIT'] for entidad in entidades_unicas])
 
     entidades_ordenadas = sorted(entidades_completas, key=lambda entidad: PERSONALIZED_ORDER.index(entidad.razonEntidad))

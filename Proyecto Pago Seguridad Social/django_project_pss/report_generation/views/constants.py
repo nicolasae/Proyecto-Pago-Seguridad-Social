@@ -1,14 +1,14 @@
 from openpyxl.styles import Font, Alignment, NamedStyle
 
 PERSONALIZED_ORDER = [
+    'PENSION',
     'SALUD',
     'RIESGOS PROFESIONALES',
-    'PENSION',
-    'MEN',
+    'CAJA DE COMPENSACION FAMILIAR',
+    'ICBF',
     'SENA',
     'ESAP',
-    'ICBF',
-    'CAJA DE COMPENSACION FAMILIAR',
+    'MEN',
 ]
 
 # Styles

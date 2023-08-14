@@ -10,3 +10,6 @@ def copy_data_from_existing_sheet(source_sheet, target_sheet):
             target_cell.font = bold_font  
         
         row_index += 1
+
+def convert_empty_to_zero(value):
+    return value if value != None else 0

@@ -6,103 +6,8 @@ from django.http import HttpResponse
 from django.db.models import Sum,Case, CharField, Value, When
 from django.core.exceptions import ObjectDoesNotExist
 from document_upload.models import *
-from .functions import *
-from .constants import *
-
-def convert_empty_to_zero(value):
-    return value if value != None else 0
-
-def generate_excel_report_consolidado(data, year, month):
-    source_file  = 'media/plantillas/Consolidado.xlsx'
-    # Load the existing excel file
-    source_workbook = load_workbook(source_file)
-
-    # Get the first sheet of the existing excel file
-    source_sheet = source_workbook.active
-
-    # Create a new Excel file for the spreadsheet data
-    workbook = openpyxl.Workbook()
-    sheet1 = workbook.active
-
-    cells_range_entidad = "A1:C1"
-    cells_range_empleado = "D1:G1"
-    cells_range_patron = "H1:N1"
-
-    # # Copy the data from the source sheet to the new sheet
-    copy_data_from_existing_sheet(source_sheet, sheet1)
-    
-    sheet1.merge_cells(cells_range_entidad)
-    sheet1.merge_cells(cells_range_empleado)
-    sheet1.merge_cells(cells_range_patron)
-
-    merged_ranges = [cells_range_entidad, cells_range_empleado, cells_range_patron]
-
-    # Set alignment for merged cells
-    for merged_range in merged_ranges:
-        start_cell, end_cell = merged_range.split(":")
-        start_row, start_column = openpyxl.utils.coordinate_to_tuple(start_cell)
-        end_row, end_column = openpyxl.utils.coordinate_to_tuple(end_cell)
-        
-        for row in range(start_row, end_row + 1):
-            for column in range(start_column, end_column + 1):
-                cell = sheet1.cell(row=row, column=column)
-                cell.alignment = center_alignment
-                cell.font = bold_font
-
-    # Assign the desired name to the sheet
-    sheet_name = f"Datos-{year}-{month}"
-    sheet1.title = sheet_name
-
-    # Add additional information to the sheet
-    save_data(sheet1, data)
-
-    # Create the HTTP response and return the file for download
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="Consolidado-{year}-{month}.xlsx"'
-    workbook.save(response)
-
-    return response
-
-def get_data_values(date):
-    try:
-        empleados = valoresEmpleado.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-        empleados_ordenados = sorted(
-            empleados, key=lambda empleado: PERSONALIZED_ORDER.index(empleado.NIT.razonEntidad)
-        )
-
-        patrones = valoresPatron.objects.filter(fecha=date).order_by('NIT__razonEntidad')
-        patrones_ordenados = sorted(
-            patrones, key=lambda patron: PERSONALIZED_ORDER.index(patron.NIT.razonEntidad)
-        )
-
-        # Create a dictionary to map entity names to indices
-        entidad_to_index = {entidad: index for index, entidad in enumerate(PERSONALIZED_ORDER)}
-        
-        # Get the filtered objects and assign them order values
-        valores_planilla_ordenados = valoresPlanilla.objects.filter(
-            numeroPlanilla__fecha=date
-        ).annotate(
-            entidad_order=Case(
-                *[When(codigoEntidad__concepto=entidad, then=Value(index)) for entidad, index in entidad_to_index.items()],
-                default=Value(len(PERSONALIZED_ORDER)), output_field=CharField()
-            )
-        ).order_by('entidad_order')
-
-        # Create a dictionary to store the information grouped by NIT
-        data = {
-            'Valores patron':patrones_ordenados,
-            'Valores empleado':empleados_ordenados,
-            'Valores planilla': valores_planilla_ordenados
-        }
-    
-        return data
-    
-    except ObjectDoesNotExist:
-        return None  # Return None if there's no data for the given date or any other related error
-    except Exception as e:
-        # Handle other exceptions as needed, such as database errors, unexpected behavior, etc.
-        print(f"An error occurred: {e}")
-        return None
+from ..functions import *
+from ..constants import *
 
 def process_data_empleados(data):
     # Create a dictionary to store the information grouped by NIT
@@ -315,29 +220,26 @@ def save_data(sheet,data):
     if current_tipo_entidad is not None: 
         add_subtotal(sheet, sum_subtotales, current_row, current_tipo_entidad)
         current_row += 1
-        print('cantidad',sum_subtotales)
         for i in range(len(sum_subtotales)):
                 if (i == 12):
                     sum_totales[i] = sum_subtotales[i]
                 else:
                     sum_totales[i] += sum_subtotales[i]
 
-    add_totales(sheet, sum_totales, current_row)
-    
+    add_totales(sheet, sum_totales, current_row)   
 
 def add_subtotal(sheet, sum_subtotales, current_row, tipo_entidad):      
     # Add the subtotal cells and apply the style
     sheet[f"B{current_row}"] = "Subtotal"
     sheet[f"C{current_row}"] = tipo_entidad
-    sheet[f"B{current_row}"].font = bold_font
-    sheet[f"C{current_row}"].font = bold_font
+    # sheet[f"B{current_row}"].font = bold_font
+    # sheet[f"C{current_row}"].font = bold_font
     for col_index, value in enumerate(sum_subtotales):
         col_letter = chr(ord('D') + col_index) 
-        print(col_letter)
         if ( col_letter != 'P'):
             sheet[f"{col_letter}{current_row}"] = value
             sheet[f"{col_letter}{current_row}"].style = currency_style
-            sheet[f"{col_letter}{current_row}"].font = bold_font
+            # sheet[f"{col_letter}{current_row}"].font = bold_font
         else:
             continue
 
@@ -368,7 +270,7 @@ def add_totales(sheet, data, current_row):
         cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
         if isinstance(value, (int, float)):
             cell.style = currency_style
-        cell.font = bold_font
+        # cell.font = bold_font
 
 
         

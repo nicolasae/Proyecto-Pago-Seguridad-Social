@@ -1,14 +1,11 @@
 from django.shortcuts import render
-from django.contrib import messages
 
 from document_upload.models import *
 from .report_planilla import *
 from .report_patronales import *
-from .report_temporales import *
-from .report_permanentes import *
 from .report_deducciones import *
 from .revision import *
-from .consolidado import *
+from .consolidado.main import *
 
 def download_view(request):
     if request.method == 'POST':
@@ -70,34 +67,6 @@ def create_report_patronales(request, year, month):
         }        
         return render(request, 'reports.html', context)
 
-def create_report_temporales(request,year,month):
-    date = year + '/' + month
-    data_temporales = get_data_temporales(date)
-
-    if len(data_temporales) > 0:
-        return generate_excel_report_temporales(data_temporales, year, month)
-    else:
-        context = {
-            'show_alert': True,
-            'alert_type':"danger",
-            'message':f'No hay información disponible de patronales temporales para el periodo: {date}.',
-        }        
-        return render(request, 'reports.html', context)
-
-def create_report_permanentes(request,year, month):
-    date = year + '/' + month
-    data_permanentes = get_data_permanentes(date)
-
-    if (len(data_permanentes) > 0):
-        return generate_excel_report_permanentes(data_permanentes, year, month)
-    else:
-        context = {
-            'show_alert': True,
-            'alert_type':"danger",
-            'message':f'No hay información disponible de patronales permanentes para el periodo: {date}.',
-        }        
-        return render(request, 'reports.html', context)
-
 def create_revision(request, year, month):
     return revision(request,year,month)
 
@@ -120,7 +89,7 @@ def create_report_consolidado(request, year, month):
     data = get_data_values(date)
     
     if data is not None and all(data.values()):
-        return generate_excel_report_consolidado(data,year,month)
+        return generate_excel_report(data,year,month)
     else:
         context = {
             'show_alert': True,

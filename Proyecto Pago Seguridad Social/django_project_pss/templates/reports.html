@@ -14,9 +14,11 @@
         <h1> Generar Reporte</h1>
 
         {% if show_alert %}
-            <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div id="messages">
+                <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
         {% endif %}     
         
@@ -69,8 +71,13 @@
                     <button type="submit" class="btn-outline-local" name="btn_consolidado">
                         Reporte Consolidado
                     </button>
-                </div>                                                                          
-
+                </div>                                                                                                                                                  
+                
+                <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
+                    <button class="btn-outline-local" name="btn_descargar">
+                        Descargar documentos Guardados para la fecha
+                    </button>
+                </div> 
             </section>
         </form>
     </main>
@@ -112,6 +119,15 @@
 
         // Initialize the selected date when the page loads
         updateSelectedDate();
+    </script>
+
+    <script>
+        setTimeout(function() {
+            const alertDiv = document.getElementById('messages')
+            if (alertDiv) {
+                alertDiv.style.display = 'none';
+            }
+        }, 2500); // 3000 = 3 seconds
     </script>
 
 {% endblock %}

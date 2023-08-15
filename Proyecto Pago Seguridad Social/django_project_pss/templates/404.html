@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Pagina no encontrada 404{% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+<section class="row-cabecera">
+    {% include "navbar.html" %} 
+</section>
+
+<main class="cuerpo-contenido">    
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="text-center">
+            <h1 class="display-1 fw-bold">404</h1>
+            <p class="fs-3"> <span class="text-danger">Opps!</span> Página no encontrada.</p>
+            <p class="lead">
+                La página que esta buscando no existe.
+            </p>
+            <a href="/" class="btn-outline-local">Inicio</a>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

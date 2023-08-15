@@ -1,5 +1,4 @@
 import os
-import logging
 
 def create_folder_if_not_exists(folder_path):
     # Check if the folder path exists

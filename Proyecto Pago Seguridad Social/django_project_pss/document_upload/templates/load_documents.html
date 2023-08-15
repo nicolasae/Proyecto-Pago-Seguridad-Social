@@ -14,20 +14,17 @@
 
     {% if show_alert %}
         <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
-            <strong>{{ message }}</strong>
+            <strong>{{ message }}</strong> 
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% else %}
         {% if missing_files %}
-            <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
-                <p>Los siguientes archivos no se subieron:</p>
-                <ul>
-                    {% for file in missing_files %}
-                        <li>{{ file }}</li>
-                    {% endfor %}
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            {% for file in missing_files %}
+                <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
+                    <strong>El archivo {{ file }} debe ser subido</strong> 
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}          
         {% endif %}
     {% endif %}
 

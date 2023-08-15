@@ -42,7 +42,69 @@ def upload_data_entidades(request):
 
     return render(request, 'load_data_entidades.html')
 
-# This function handles document uploads and processing when the HTTP request method is POST.
+def process_document_upload_files(request, data):
+    # Lista para almacenar los nombres de los formularios que no se proporcionaron.
+        missing_files = []
+        print(data['filesDict'])
+
+        # Loop through each file type and process the uploaded files.
+        for file_info in data['filesDict']:
+            form_name = file_info['nombreFormulario']
+            new_filename = file_info['nuevoNombreArchivo']
+            new_filename_csv = file_info['nuevoNombreArchivoCSV']
+            
+            # Get the uploaded file for the current file type.
+            file = request.FILES.get(form_name)
+
+            # Check if a file was provided for the current form_name before proceeding.
+            if file:
+                # Set the file paths for the xlsx and csv files.
+                path_file_xlsx = os.path.join(data['folder_path_xlsx'], new_filename)
+                path_file_csv = os.path.join(data['folder_path_csv'], new_filename_csv)
+
+                # Save the uploaded file to the xlsx folder.
+                save_uploaded_file(file, path_file_xlsx)
+
+                # Convert the xlsx file to csv format and save it in the csv folder.           
+                converter_xlsx_to_csv(path_file_xlsx, path_file_csv)
+
+                # Clean up the csv file by removing any empty rows.
+                clean_empty_rows_csv(path_file_csv)
+
+                # Based on the type of form, extract data from the processed csv file and save it.
+                if form_name == 'planilla':
+                    extract_data_for_planilla(path_file_csv, data['selected_year'], data['selected_month'])
+                if form_name == 'patronalesTemporales':
+                    tipo_patronal = 'temporal'
+                    extract_data_patronales(path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)
+                if form_name == 'patronalesPermanentes':
+                    tipo_patronal = 'permanente'
+                    extract_data_patronales(path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)
+                if form_name == 'deduc2':
+                    unidad = 2
+                    extract_data_deducciones(path_file_csv, data['selected_year'], data['selected_month'],unidad)
+                if form_name == 'deduc8':
+                    unidad = 8
+                    extract_data_deducciones(path_file_csv, data['selected_year'], data['selected_month'],unidad)
+                if form_name == 'deduc9':
+                    unidad = 9
+                    extract_data_deducciones(path_file_csv, data['selected_year'], data['selected_month'],unidad)
+
+            else:
+                equivalences_names_files = {
+                    'planilla':'Planilla Detallada',
+                    'patronalesTemporales':'Patronales de Planta Temporal',
+                    'patronalesPermanentes':'Patronales de Planta Permanente',
+                    'deduc2':'Deducciones Unidad 2',
+                    'deduc8':'Deducciones Unidad 8',
+                    'deduc9':'Deducciones Unidad 9'
+                    
+                }
+                # If the file was not provided, add the name of the form to the list of missing files.
+                missing_files.append(equivalences_names_files[form_name])
+
+        return missing_files
+
 def upload_documents( request ):    
     if request.method == 'POST':
         # Access the data from the form submitted via the POST method.
@@ -83,64 +145,24 @@ def upload_documents( request ):
             },
         ]
 
-       # Define the folder paths for saving the uploaded files in xlsx and csv formats.
+        # Define the folder paths for saving the uploaded files in xlsx and csv formats.
         folder_path_xlsx = os.path.join(settings.MEDIA_ROOT, 'xlsx', selected_year, selected_month)
         folder_path_csv = os.path.join(settings.MEDIA_ROOT, 'csv', selected_year, selected_month)
         
         # Ensure that the folders for saving the files exist; if not, create them.
         create_folder_if_not_exists(folder_path_xlsx)
         create_folder_if_not_exists(folder_path_csv)
+        
+        data = {
+            'filesDict':filesDict, 
+            'folder_path_xlsx':folder_path_xlsx,
+            'folder_path_csv':folder_path_csv,
+            'selected_year':selected_year,
+            'selected_month':selected_month
+        }
 
-        # Lista para almacenar los nombres de los formularios que no se proporcionaron.
-        missing_files = []
-
-        # Loop through each file type and process the uploaded files.
-        for file_info in filesDict:
-            form_name = file_info['nombreFormulario']
-            new_filename = file_info['nuevoNombreArchivo']
-            new_filename_csv = file_info['nuevoNombreArchivoCSV']
-            
-            # Get the uploaded file for the current file type.
-            file = request.FILES.get(form_name)
-
-            # Check if a file was provided for the current form_name before proceeding.
-            if file:
-                # Set the file paths for the xlsx and csv files.
-                path_file_xlsx = os.path.join(folder_path_xlsx, new_filename)
-                path_file_csv = os.path.join(folder_path_csv, new_filename_csv)
-
-                # Save the uploaded file to the xlsx folder.
-                save_uploaded_file(file, path_file_xlsx)
-
-                # Convert the xlsx file to csv format and save it in the csv folder.           
-                converter_xlsx_to_csv(path_file_xlsx, path_file_csv)
-
-                # Clean up the csv file by removing any empty rows.
-                clean_empty_rows_csv(path_file_csv)
-
-                # Based on the type of form, extract data from the processed csv file and save it.
-                if form_name == 'planilla':
-                    extract_data_for_planilla(path_file_csv, selected_year, selected_month)
-                if form_name == 'patronalesTemporales':
-                    tipo_patronal = 'temporal'
-                    extract_data_patronales(path_file_csv, selected_year, selected_month, tipo_patronal)
-                if form_name == 'patronalesPermanentes':
-                    tipo_patronal = 'permanente'
-                    extract_data_patronales(path_file_csv, selected_year, selected_month, tipo_patronal)
-                if form_name == 'deduc2':
-                    unidad = 2
-                    extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)
-                if form_name == 'deduc8':
-                    unidad = 8
-                    extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)
-                if form_name == 'deduc9':
-                    unidad = 9
-                    extract_data_deducciones(path_file_csv, selected_year, selected_month,unidad)
-
-            else:
-                # If the file was not provided, add the name of the form to the list of missing files.
-                missing_files.append(form_name)
-
+        missing_files = process_document_upload_files(request, data)
+        print(missing_files)
         # Determine if all files were provided or if some are missing.
         show_alert = len(missing_files) == 0
         alert_type = "success" if show_alert else "danger"

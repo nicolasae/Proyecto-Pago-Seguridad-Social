@@ -86,14 +86,16 @@ def save_data_patronales(sheet,data):
         sheet[f"J{current_row}"] = item['PERMANENTE UN 9']
         sheet[f"K{current_row}"] = item['TOTAL']
 
-        # Add styles to the cells
-        sheet[f"E{current_row}"].style = currency_style 
-        sheet[f"F{current_row}"].style = currency_style 
-        sheet[f"G{current_row}"].style = currency_style 
-        sheet[f"H{current_row}"].style = currency_style 
-        sheet[f"I{current_row}"].style = currency_style 
-        sheet[f"J{current_row}"].style = currency_style 
-        sheet[f"K{current_row}"].style = currency_style 
+        # Add format styles 
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K']
+
+        for col in columns_to_style:
+            cell = f"{col}{current_row}"
+
+            if col in ['E', 'F','G', 'H','I','J','K']:
+                sheet[cell].style = currency_style 
+            sheet[cell].font = font_style
+            sheet[cell].border = border_style
                
         # Increment the current row number for the next iteration
         current_row += 1
@@ -117,7 +119,8 @@ def save_data_patronales(sheet,data):
         cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
         if col_idx > 1:
             cell.style = currency_style
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
 
 def generate_excel_report_patronales(data, year, month):
 

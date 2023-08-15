@@ -63,13 +63,18 @@ def save_data_deducciones(sheet,data):
         sheet[f"E{current_row}"] = item['UNIDAD 8']
         sheet[f"F{current_row}"] = item['UNIDAD 9']
         sheet[f"G{current_row}"] = item['TOTAL']
+        
+        # Add format styles 
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
-        # Add Styles 
-        sheet[f"D{current_row}"].style = currency_style 
-        sheet[f"E{current_row}"].style = currency_style  
-        sheet[f"F{current_row}"].style = currency_style  
-        sheet[f"G{current_row}"].style = currency_style  
-       
+        for col in columns_to_style:
+            cell = f"{col}{current_row}"
+
+            if col in ['D','E', 'F','G']:
+                sheet[cell].style = currency_style 
+            sheet[cell].font = font_style
+            sheet[cell].border = border_style
+
         # Increment the current row number for the next iteration
         current_row += 1
 
@@ -89,7 +94,8 @@ def save_data_deducciones(sheet,data):
         cell = sheet.cell(row=additional_row_index, column=col_idx, value=value)
         if col_idx > 3:
             cell.style = currency_style
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
 
 def generate_excel_report_deducciones(data, year, month):
     source_file  = 'media/plantillas/Resumen_deducciones.xlsx'
@@ -107,7 +113,7 @@ def generate_excel_report_deducciones(data, year, month):
     copy_data_from_existing_sheet(source_sheet, sheet1)
 
     # Assign the desired name to the sheet
-    sheet_name = f"Datos-{year}-{month}"
+    sheet_name = f"Deducciones-{year}-{month}"
     sheet1.title = sheet_name
 
     # Add additional information to the sheet

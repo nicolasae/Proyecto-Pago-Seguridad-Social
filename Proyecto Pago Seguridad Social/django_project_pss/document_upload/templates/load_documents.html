@@ -19,12 +19,14 @@
         </div>
     {% else %}
         {% if missing_files %}
-            {% for file in missing_files %}
-                <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
-                    <strong>El archivo {{ file }} debe ser subido</strong> 
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}          
+            <div id="missingFiles">
+                {% for file in missing_files %}
+                    <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
+                        <strong>El archivo {{ file }} debe ser subido</strong> 
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>          
         {% endif %}
     {% endif %}
 
@@ -152,6 +154,15 @@
 
     // Initialize the selected date when the page loads
     updateSelectedDate();
+</script>
+
+<script>
+    setTimeout(function() {
+        const alertMissingFilesDiv = document.getElementById('missingFiles')
+        if (alertMissingFilesDiv) {
+            alertMissingFilesDiv.style.display = 'none';
+        }
+    }, 4000); // 4000 = 4 seconds
 </script>
 
 

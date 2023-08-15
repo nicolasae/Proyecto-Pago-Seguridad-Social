@@ -10,12 +10,14 @@
     <h1>Datos entidades</h1>
 
     {% if messages %}
-        {% for message in messages %}            
-            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong> 
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}        
+        <div id="messages">
+            {% for message in messages %}            
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong> 
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}        
+        </div>
        
     {% endif %}
 
@@ -51,5 +53,14 @@
     </form>
 
 </main>
+
+<script>
+    setTimeout(function() {
+        const alertDiv = document.getElementById('messages')
+        if (alertDiv) {
+            alertDiv.style.display = 'none';
+        }
+    }, 3000); // 4000 = 4 seconds
+</script>
 
 {% endblock %}

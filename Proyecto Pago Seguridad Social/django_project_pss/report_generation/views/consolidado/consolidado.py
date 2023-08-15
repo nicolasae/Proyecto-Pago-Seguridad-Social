@@ -1,10 +1,6 @@
 import openpyxl 
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
-
-from django.http import HttpResponse
-from django.db.models import Sum,Case, CharField, Value, When
-from django.core.exceptions import ObjectDoesNotExist
 from document_upload.models import *
 from ..functions import *
 from ..constants import *
@@ -122,7 +118,6 @@ def process_data_patron(data):
 
         data_dict[NIT]['TOTAL'] += total
 
-    print(data_dict)
     return data_dict
 
 def process_data_planilla(data):

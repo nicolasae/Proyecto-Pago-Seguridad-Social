@@ -41,7 +41,7 @@ def create_report_planilla(request,year,month):
 
     if info_planilla.exists():       
         values_planilla = get_values_planilla(date)   
-        response = generate_excel_report(info_planilla, values_planilla, year, month)
+        response = generate_excel_report_planilla(info_planilla, values_planilla, year, month)
     
         return response       
     else:

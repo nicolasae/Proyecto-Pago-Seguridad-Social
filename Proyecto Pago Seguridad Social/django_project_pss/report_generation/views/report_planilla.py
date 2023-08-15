@@ -45,7 +45,7 @@ def get_values_planilla(date):
 
     return valores_planilla_filtrados
 
-def generate_excel_report(info_planilla,values_planilla, year, month):
+def generate_excel_report_planilla(info_planilla,values_planilla, year, month):
     # Create an Excel file for the spreadsheet data
     workbook = openpyxl.Workbook()
 
@@ -71,7 +71,8 @@ def create_sheet_info_planilla(workbook):
 
     for row_num, header in enumerate(field_mapping.values(), start=1):
         cell = sheet.cell(row=row_num, column=1, value=header)
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
 
     return sheet
 
@@ -93,7 +94,8 @@ def create_sheet_values_planilla(workbook):
 
     for col_idx, header_text in headers_sheet.items():
         cell = sheet.cell(row=1, column=col_idx, value=header_text)
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style 
 
     return sheet
 
@@ -108,6 +110,8 @@ def write_info_planilla_data(sheet, info_planilla):
             value = getattr(obj, attribute_name, '')  # Get the attribute value using getattr
             cell = sheet.cell(row = row_num, column = 2, value = value)
             cell.alignment = left_alignment
+            cell.font = font_style
+            cell.border = border_style
             row_num += 1
 
 def write_values_planilla_data(sheet, values_planilla):
@@ -156,6 +160,17 @@ def write_values_planilla_data(sheet, values_planilla):
             sheet[f"H{row_index}"].style = currency_style 
             sheet[f"I{row_index}"].style = currency_style
 
+            # Add format styles 
+            columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I']
+
+            for col in columns_to_style:
+                cell = f"{col}{row_index}"
+
+                if col in ['E', 'F','G', 'H','I']:
+                    sheet[cell].style = currency_style 
+                sheet[cell].font = font_style
+                sheet[cell].border = border_style
+
             # Increment the row_index for the next row
             row_index += 1
 
@@ -174,13 +189,14 @@ def write_values_planilla_data(sheet, values_planilla):
         sheet.cell(row=row_index, column=1, value=total_data[0])
         sheet.cell(row=row_index, column=2, value=total_data[1])
         cell = sheet.cell(row=row_index, column=3, value=total_data[2])
-        cell.font = bold_font
+        cell.font = header_style
 
         for col_idx, value in enumerate(total_data[3:], start=4):
             cell = sheet.cell(row=row_index, column=col_idx, value=value)
             if col_idx > 4:
                 cell.style = currency_style
-            cell.font = bold_font
+            cell.font = header_style
+            cell.border = border_style
 
         # Increment the row_index for the next group
         row_index += 1
@@ -201,11 +217,13 @@ def write_values_planilla_data(sheet, values_planilla):
     sheet.cell(row=row_index, column=1, value=grand_total_data[0])
     sheet.cell(row=row_index, column=2, value=grand_total_data[1])
     cell = sheet.cell(row=row_index, column=3, value=grand_total_data[2])
-    cell.font = bold_font
+    cell.font = header_style
+    cell.border = border_style
     
     for col_idx, value in enumerate(grand_total_data[3:], start=4):
         cell = sheet.cell(row=row_index, column=col_idx, value=value)
         if col_idx > 4:
             cell.style = currency_style
-        cell.font = bold_font
+        cell.font = header_style
+        cell.border = border_style
         

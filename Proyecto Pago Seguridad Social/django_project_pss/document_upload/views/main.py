@@ -45,7 +45,6 @@ def upload_data_entidades(request):
 def process_document_upload_files(request, data):
     # Lista para almacenar los nombres de los formularios que no se proporcionaron.
         missing_files = []
-        print(data['filesDict'])
 
         # Loop through each file type and process the uploaded files.
         for file_info in data['filesDict']:
@@ -162,7 +161,6 @@ def upload_documents( request ):
         }
 
         missing_files = process_document_upload_files(request, data)
-        print(missing_files)
         # Determine if all files were provided or if some are missing.
         show_alert = len(missing_files) == 0
         alert_type = "success" if show_alert else "danger"

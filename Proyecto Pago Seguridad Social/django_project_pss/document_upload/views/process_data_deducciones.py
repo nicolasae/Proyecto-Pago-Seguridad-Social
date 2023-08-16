@@ -14,8 +14,7 @@ def clean_data_deducciones(csv_file_path):
         "Codigo",
         "Fecha Ejec.",
         "Descripcion Transaccion",
-        "Posicion Pago No Pptal",
-        "Descrip Posicion Pago No Pptal",
+        "Posicion Pago No Pptal",        
         "Valor Doc",
         "Base",
         "Tarifa",
@@ -32,20 +31,32 @@ def clean_data_deducciones(csv_file_path):
         "Concepto Declaracion Retefuente",
     ]
 
+    # words_to_delete_update = [
+    #     "Descrip Posicion Pago No Pptal",
+    # ]
+
+    words_to_keep_rows = ["DTOS"]
+
     delete_columns_by_words(csv_file_path, words_to_delete_columns)
+    keep_rows_by_fragments(csv_file_path,words_to_keep_rows)
+    # delete_columns_by_words(csv_file_path, words_to_delete_update)
 
 def calculate_accumulated_balance(data):
     sum_by_entity = {}
 
-    for item in data[1:]:
-        saldo_sin_comas = item[1].replace(",", "")
+    # for item in data[1:]:
+    for item in data:
+        saldo_sin_comas = item[2].replace(",", "")
         partes = saldo_sin_comas.split(".")
         saldo = int(partes[0])
-
-        if item[2] in sum_by_entity:
-            sum_by_entity[item[2]][0] += saldo
+        
+        if item[3] in sum_by_entity:
+            print('entro')
+            if (saldo > 0):
+                sum_by_entity[item[3]][0] += saldo
         else:
-            sum_by_entity[item[2]] = [saldo, item[0]]
+            sum_by_entity[item[3]] = [saldo, item[1]]
+        
 
     return sum_by_entity
 

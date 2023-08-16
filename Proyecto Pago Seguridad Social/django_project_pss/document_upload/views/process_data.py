@@ -138,3 +138,18 @@ def keep_rows_with_six_columns(file_path):
 
     # Replace the original file with the updated content from the temporary file
     shutil.move(temp_file_path, file_path)
+
+def keep_rows_by_fragments(file_path, fragments_to_keep):
+    # Create a temporary file to write the updated content
+    temp_file_path = file_path + '.temp'
+    with open(temp_file_path, 'w', newline='') as temp_file:
+        writer = csv.writer(temp_file)
+        with open(file_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                should_keep = any(any(fragment in cell for fragment in fragments_to_keep) for cell in row)
+                if should_keep:
+                    writer.writerow(row)
+
+    # Replace the original file with the updated content from the temporary file
+    shutil.move(temp_file_path, file_path)

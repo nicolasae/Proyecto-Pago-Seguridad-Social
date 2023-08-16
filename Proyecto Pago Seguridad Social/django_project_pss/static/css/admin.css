@@ -1,0 +1,23 @@
+:root {
+    --primary: #004278;
+    --header-branding-color: white;
+    --accent:white;
+}
+
+#header {
+    background-color: var(--primary);
+}
+
+#branding h1 {
+    font-weight: bolder;
+}
+
+/* .button, input[type=submit], input[type=button], .submit-row input, a.button{
+    background: var(--azul_institucional);
+    border: 0;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+    font-weight: bolder;
+    margin: 0 10px;
+} */

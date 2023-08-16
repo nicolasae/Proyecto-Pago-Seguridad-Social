@@ -6,6 +6,11 @@ from django.conf.urls.static import static
 from .views import *
 
 
+admin.site.index_title = "Bienvenido"
+admin.site.site_title = "Admin Portal"
+admin.site.site_header = "Administrador Pago Seguridad Social"
+
+
 urlpatterns = [
     path('', render_home_page, name = 'pagina_inicio'),
     path('admin/', admin.site.urls),

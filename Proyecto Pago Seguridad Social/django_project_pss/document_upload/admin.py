@@ -9,3 +9,4 @@ admin.site.register(infoPlanilla)
 admin.site.register(valoresPlanilla)
 admin.site.register(valoresPatron)
 admin.site.register(valoresEmpleado)
+

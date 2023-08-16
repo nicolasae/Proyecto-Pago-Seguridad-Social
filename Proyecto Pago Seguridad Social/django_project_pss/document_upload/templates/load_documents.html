@@ -13,9 +13,11 @@
     <h1>Subir documentos</h1>
 
     {% if show_alert %}
-        <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
-            <strong>{{ message }}</strong> 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div id="alert">
+            <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong> 
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
     {% else %}
         {% if missing_files %}
@@ -162,7 +164,13 @@
         if (alertMissingFilesDiv) {
             alertMissingFilesDiv.style.display = 'none';
         }
-    }, 4000); // 4000 = 4 seconds
+    }, 3000); // 4000 = 4 seconds
+    setTimeout(function() {
+        const alertFilesDiv = document.getElementById('alert')
+        if (alertFilesDiv) {
+            alertFilesDiv.style.display = 'none';
+        }
+    }, 3000); // 4000 = 4 seconds
 </script>
 
 

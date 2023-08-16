@@ -42,7 +42,7 @@ class Entidad(models.Model):
         verbose_name_plural  =  "Entidades"
 
     def __str__(self):
-        return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad} -Codigo:{self.codigo}"
+        return f"NIT: {self.NIT} - {self.concepto} - Razón Entidad: {self.razonEntidad}"
    
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)

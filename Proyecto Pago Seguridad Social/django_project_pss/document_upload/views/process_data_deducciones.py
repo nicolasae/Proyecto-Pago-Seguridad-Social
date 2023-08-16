@@ -39,7 +39,6 @@ def clean_data_deducciones(csv_file_path):
 
     delete_columns_by_words(csv_file_path, words_to_delete_columns)
     keep_rows_by_fragments(csv_file_path,words_to_keep_rows)
-    # delete_columns_by_words(csv_file_path, words_to_delete_update)
 
 def calculate_accumulated_balance(data):
     sum_by_entity = {}
@@ -51,7 +50,6 @@ def calculate_accumulated_balance(data):
         saldo = int(partes[0])
         
         if item[3] in sum_by_entity:
-            print('entro')
             if (saldo > 0):
                 sum_by_entity[item[3]][0] += saldo
         else:

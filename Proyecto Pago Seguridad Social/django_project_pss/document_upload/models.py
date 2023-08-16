@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 # Create your models here.
 class Patronal(models.Model):
@@ -8,6 +7,9 @@ class Patronal(models.Model):
         ('permanente','Permanente')
     )
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)
+
+    class  Meta:
+        verbose_name_plural  =  "Patronales"
 
     def __str__(self):
         return f"Tipo: {self.tipo}"
@@ -18,6 +20,9 @@ class Gasto(models.Model):
         ('aportes', 'Aportes sobre nómina'),
     )
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)
+
+    class  Meta:
+        verbose_name_plural  =  "Gastos"
 
     def __str__(self):
         return f"Tipo: {self.tipo}"
@@ -32,6 +37,9 @@ class Entidad(models.Model):
     tipoCuentaPagar = models.CharField(max_length=100)
     codigoDescuento = models.CharField(max_length=100, default = 'COD')
     tipo = models.CharField(max_length=100,default='tipo')
+
+    class  Meta:
+        verbose_name_plural  =  "Entidades"
 
     def __str__(self):
         return f"{self.concepto} - NIT: {self.NIT} - Razón Entidad: {self.razonEntidad} -Codigo:{self.codigo}"
@@ -51,6 +59,9 @@ class infoPlanilla(models.Model):
     PIN = models.CharField(max_length=100)
     tipoPlanilla = models.CharField(max_length=100)
 
+    class  Meta:
+        verbose_name_plural  =  "Información Planillas"
+
     def __str__(self):
         return f"Fecha reporte: {self.fecha} - Número planilla: {self.numeroPlanilla}"
     
@@ -66,7 +77,8 @@ class valoresPlanilla(models.Model):
     valorPagar = models.IntegerField(default=0)
 
     class Meta:
-        # Definir la combinación de campos que debe ser única
+        verbose_name_plural  =  "Valores Planilla"
+        # Define the combination of fields that must be unique
         unique_together = ('numeroPlanilla', 'codigoEntidad',)
 
     def __str__(self):
@@ -82,7 +94,8 @@ class valoresPatron(models.Model):
     total = models.IntegerField(default=0)
 
     class Meta:
-        # Definir la combinación de campos que debe ser única
+        verbose_name_plural  =  "Valores Patrón"
+        # Define the combination of fields that must be unique
         unique_together = ('NIT', 'tipoPatronal', 'fecha',)
 
     def __str__(self):
@@ -96,8 +109,9 @@ class valoresEmpleado(models.Model):
     saldo = models.IntegerField(default=0)
 
     class Meta:
-        # Definir la combinación de campos que debe ser única
+        verbose_name_plural  =  "Valores Empleados"
+        # Define the combination of fields that must be unique
         unique_together = ('NIT', 'numDoc', 'fecha',)
 
     def __str__(self):
-        return f"{self.NIT} - Unidad: {self.unidad}"
+        return f"Fecha:{self.fecha} {self.NIT} - Unidad: {self.unidad}"

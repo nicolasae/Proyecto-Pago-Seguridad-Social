@@ -1,5 +1,6 @@
 import os
 import openpyxl
+from datetime import datetime
 
 from django.contrib import messages
 from django.shortcuts import render,redirect
@@ -11,6 +12,15 @@ from .process_data_entidad import *
 from .process_data_planilla import *
 from .process_data_patronales import * 
 from .process_data_deducciones import * 
+
+
+def delete_records_by_date(model, date_field_name, target_date):
+    try:
+        records_to_delete = model.objects.filter(**{date_field_name: target_date})
+        records_to_delete.delete()
+        print(f"Registros borrados en {model._meta.verbose_name_plural}: {len(records_to_delete)}")
+    except Exception as e:
+        print(f"Error al borrar registros: {str(e)}")
 
 def upload_data_entidades(request):
     if request.method == 'POST':
@@ -69,7 +79,7 @@ def process_document_upload_files(request, data):
 
                 # Clean up the csv file by removing any empty rows.
                 clean_empty_rows_csv(path_file_csv)
-
+                
                 # Based on the type of form, extract data from the processed csv file and save it.
                 if form_name == 'planilla':
                     extract_data_for_planilla(path_file_csv, data['selected_year'], data['selected_month'])
@@ -88,7 +98,6 @@ def process_document_upload_files(request, data):
                 if form_name == 'deduc9':
                     unidad = 9
                     extract_data_deducciones(path_file_csv, data['selected_year'], data['selected_month'],unidad)
-
             else:
                 equivalences_names_files = {
                     'planilla':'Planilla Detallada',
@@ -96,8 +105,7 @@ def process_document_upload_files(request, data):
                     'patronalesPermanentes':'Patronales de Planta Permanente',
                     'deduc2':'Deducciones Unidad 2',
                     'deduc8':'Deducciones Unidad 8',
-                    'deduc9':'Deducciones Unidad 9'
-                    
+                    'deduc9':'Deducciones Unidad 9'                    
                 }
                 # If the file was not provided, add the name of the form to the list of missing files.
                 missing_files.append(equivalences_names_files[form_name])
@@ -159,6 +167,12 @@ def upload_documents( request ):
             'selected_year':selected_year,
             'selected_month':selected_month
         }
+
+        date = f"{data['selected_year']}/{data['selected_month']}"
+        delete_records_by_date(valoresPlanilla, 'numeroPlanilla__fecha', date)
+        delete_records_by_date(valoresPatron, 'fecha', date)
+        delete_records_by_date(valoresEmpleado, 'fecha', date)
+
 
         missing_files = process_document_upload_files(request, data)
         # Determine if all files were provided or if some are missing.

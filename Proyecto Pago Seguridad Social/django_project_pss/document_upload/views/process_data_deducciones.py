@@ -45,15 +45,18 @@ def calculate_accumulated_balance(data):
 
     # for item in data[1:]:
     for item in data:
+        split_nit = item[3].split('.')
+        nit = split_nit[0]
+
         saldo_sin_comas = item[2].replace(",", "")
         partes = saldo_sin_comas.split(".")
         saldo = int(partes[0])
         
-        if item[3] in sum_by_entity:
+        if nit in sum_by_entity:
             if (saldo > 0):
-                sum_by_entity[item[3]][0] += saldo
+                sum_by_entity[nit][0] += saldo
         else:
-            sum_by_entity[item[3]] = [saldo, item[1]]
+            sum_by_entity[nit] = [saldo, item[1]]
         
 
     return sum_by_entity

@@ -5,7 +5,7 @@ from .process_data import *
 
 def clean_data_patronales(csv_file_path):
     words_to_delete_columns = ["UNIDAD 3", "UNIDAD 4", "UNIDAD 5","DSCTO ASMETSALUD PARA SANITAS"]  
-    words_to_delete_rows = ["TOTAL","SOLICITUD DE CDP","GASTOS DE ADMINISTRACION Y OPERACION","Unnamed"]
+    words_to_delete_rows = ["TOTAL","SOLICITUD DE CDP","GASTOS DE ADMINISTRACION Y OPERACION","Unnamed","Aporte Patronales"]
     
     delete_columns_by_words(csv_file_path, words_to_delete_columns)
     delete_rows_by_words(csv_file_path, words_to_delete_rows)
@@ -25,6 +25,13 @@ def save_data_patronales(data,type,year=None,month=None):
             NIT = '860011153'
         else:
             NIT = item[0]
+        
+        if item[2] == '': 
+            item[2] = 0
+        if item[3] == '':  
+            item[3] = 0
+        if item[4] == '':  
+            item[4] = 0
 
         total_unidades = int(item[2]) + int(item[3]) + int(item[4])
         periodo = year + '/' + month

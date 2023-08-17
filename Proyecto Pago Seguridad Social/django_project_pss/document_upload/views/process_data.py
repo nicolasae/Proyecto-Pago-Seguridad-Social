@@ -136,7 +136,9 @@ def keep_rows_with_six_columns(file_path):
         with open(file_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                if sum(1 for cell in row if cell.strip()) == 6:
+                # if sum(1 for cell in row if cell.strip()) == 6:
+                num_non_empty_cells = sum(1 for cell in row if cell.strip())
+                if 2 <= num_non_empty_cells <= 6:
                     writer.writerow(row)
 
     # Replace the original file with the updated content from the temporary file

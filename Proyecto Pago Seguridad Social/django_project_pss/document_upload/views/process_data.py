@@ -14,7 +14,7 @@ def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
 
         # Guardar el dataframe como archivo CSV
         dataframe.to_csv(folder_path_csv, index=False)
-        print("Archivo convertido exitosamente a CSV.")
+        # print("Archivo convertido exitosamente a CSV.")
     except Exception as e:
         print("Error al convertir el archivo:", e)
 
@@ -107,19 +107,22 @@ def delete_columns_by_words(file_path, words_to_delete):
         delete_column_by_index(file_path, index_col)
 
 def delete_rows_by_words(file_path, words_to_delete):
-    # Create a temporary file to write the updated content
+     # Create a temporary file to write the updated content
     temp_file_path = file_path + '.temp'
     with open(temp_file_path, 'w', newline='') as temp_file:
         writer = csv.writer(temp_file)
         with open(file_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
+            preserve_salud_total_row = False
             for row in reader:
-                should_delete = False
-                for word in words_to_delete:
-                    if any(word in cell for cell in row):
-                        should_delete = True
-                        break
-                if not should_delete:
+                row_lower = ' '.join(row).lower()
+                if "salud total" in row_lower or "salud total s.a" in row_lower:
+                    writer.writerow(row)
+                    preserve_salud_total_row = True
+                elif any(word in cell for word in words_to_delete for cell in row):
+                    if not preserve_salud_total_row:
+                        continue
+                else:
                     writer.writerow(row)
 
     # Replace the original file with the updated content from the temporary file

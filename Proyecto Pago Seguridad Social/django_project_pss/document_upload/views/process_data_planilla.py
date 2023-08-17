@@ -84,5 +84,5 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
                 valores_planilla_instance.valorPagarSinIntereses = array[7]
                 valores_planilla_instance.valorPagar = valor_total
                 valores_planilla_instance.save()
-            else:
-                print(f"Created new valoresPlanilla: {valores_planilla_instance}")
+            # else:
+            #     print(f"Created new valoresPlanilla: {valores_planilla_instance}")

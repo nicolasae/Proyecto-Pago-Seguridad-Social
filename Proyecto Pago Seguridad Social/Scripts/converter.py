@@ -43,7 +43,7 @@ def convert_all_files_to_csv( xlsx_directory, csv_directory):
             data.to_csv(new_file_path, index=False)
 
             # # Print success message for each converted file
-            print(f'The file {file} has been successfully converted to CSV as {new_file_name}.')
+            # print(f'The file {file} has been successfully converted to CSV as {new_file_name}.')
 
 # Call Functions
 convert_all_files_to_csv(xlsx_directory, csv_directory)

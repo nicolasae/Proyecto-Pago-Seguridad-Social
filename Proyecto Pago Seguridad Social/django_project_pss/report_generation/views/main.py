@@ -109,9 +109,10 @@ def download_documents(request,year,month):
     if not files_in_folder:     
         return render(request, 'reports.html', context)
 
+    filename = f"documentos_subidos-{year}/{month}"
     # Create a ZIP file in memory
     response = HttpResponse(content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename=carpeta_descargada.zip'
+    response['Content-Disposition'] = f'attachment; filename={filename}.zip'
 
     memory_zip = zipfile.ZipFile(response, 'w', zipfile.ZIP_DEFLATED)
 

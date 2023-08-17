@@ -23,7 +23,7 @@ class ValoresEmpleadoSearchFilter(admin.ModelAdmin):
 
 class ValoresPatronSearchFilter(admin.ModelAdmin):
     search_fields = ['NIT__NIT','fecha']
-    list_display = ['NIT','fecha','unidad2','unidad8','unidad9','total']
+    list_display = ['NIT','fecha','tipoPatronal','unidad2','unidad8','unidad9','total']
 
 # Register your models here.
 admin.site.register(Patronal)

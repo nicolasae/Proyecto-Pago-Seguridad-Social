@@ -19,7 +19,6 @@ def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):
         print("Error al convertir el archivo:", e)
 
 def clean_empty_rows_csv( path_file ):
-    print(path_file)
     #Get path without filename
     dir_without_name = os.path.dirname(path_file)
     temp_file_path = os.path.join(dir_without_name, "temporal.tmp")

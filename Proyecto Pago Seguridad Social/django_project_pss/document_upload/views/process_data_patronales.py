@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.contrib import messages
 
 from ..models import *
 from .process_data import *
@@ -11,13 +11,13 @@ def clean_data_patronales(csv_file_path):
     delete_rows_by_words(csv_file_path, words_to_delete_rows)
     keep_rows_with_six_columns(csv_file_path)
 
-def extract_data_patronales(csv_file_path,year,month,type):
+def extract_data_patronales(request,csv_file_path,year,month,type):
     clean_data_patronales(csv_file_path)
    
     data = read_data_from_csv(csv_file_path)
-    save_data_patronales(data,type, year, month)
+    save_data_patronales(request,data,type, year, month)
 
-def save_data_patronales(data,type,year=None,month=None):
+def save_data_patronales(request,data,type,year=None,month=None):
     TIPO_PATRONAL_CONSTANTE = Patronal.objects.get(tipo=type) 
 
     for item in data:
@@ -67,4 +67,5 @@ def save_data_patronales(data,type,year=None,month=None):
                 valores_patron_instance.save()
         else:
             print(f"Error: No Entidad instance found with NIT '{NIT}'")
-            return
+            messages.error(request, f"No se encontró ninguna entidad con NIT '{NIT}' en el archivo de patronales {type}.Por favor agregue la entidad")
+            continue

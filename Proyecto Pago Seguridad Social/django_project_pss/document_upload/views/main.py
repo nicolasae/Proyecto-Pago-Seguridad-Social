@@ -18,7 +18,7 @@ def delete_records_by_date(model, date_field_name, target_date):
     try:
         records_to_delete = model.objects.filter(**{date_field_name: target_date})
         records_to_delete.delete()
-        print(f"Registros borrados en {model._meta.verbose_name_plural}: {len(records_to_delete)}")
+        # print(f"Registros borrados en {model._meta.verbose_name_plural}: {len(records_to_delete)}")
     except Exception as e:
         print(f"Error al borrar registros: {str(e)}")
 
@@ -85,10 +85,10 @@ def process_document_upload_files(request, data):
                     extract_data_for_planilla(path_file_csv, data['selected_year'], data['selected_month'])
                 if form_name == 'patronalesTemporales':
                     tipo_patronal = 'temporal'
-                    extract_data_patronales(path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)
+                    extract_data_patronales(request,path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)
                 if form_name == 'patronalesPermanentes':
                     tipo_patronal = 'permanente'
-                    extract_data_patronales(path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)
+                    extract_data_patronales(request,path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)
                 if form_name == 'deduc2':
                     unidad = 2
                     extract_data_deducciones(path_file_csv, data['selected_year'], data['selected_month'],unidad)

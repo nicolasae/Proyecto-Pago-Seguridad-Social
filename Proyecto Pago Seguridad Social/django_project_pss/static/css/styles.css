@@ -1,17 +1,21 @@
 :root {
-    --azul_institucional:#004278;
+    --verde_institucional:#359946;
     --gris: #808080;
     --blanco:#FFFFFF;
     --verde_oscuro :#0074D9;
     --amarillo_dorado :#FFD700;
 }
 
+body , a {
+    font-family: 'Montserrat', sans-serif;
+}
+
 .titulo {
-    color: var(--azul_institucional);
+    color: var(--verde_institucional);
 }
 
 .navbar {
-    background-color: var(--azul_institucional);
+    background-color: var(--verde_institucional);
 }
 
 .cuerpo-contenido {
@@ -58,7 +62,7 @@ button.navbar-toggler{
 }
 
 .btn-local {
-    background: var(--azul_institucional);
+    background: var(--verde_institucional);
     border: 0;
     border-radius: 5px;
     padding: 10px;
@@ -69,16 +73,16 @@ button.navbar-toggler{
 
 .btn-outline-local {
     background:var(--blanco);
-    border: 1px solid var(--azul_institucional);
+    border: 1px solid var(--verde_institucional);
     border-radius: 5px;
     padding: 10px;
-    color: var(--azul_institucional);
+    color: var(--verde_institucional);
     font-weight: bolder;
     margin: 0 10px;
 }
 
 .btn-outline-local:hover{
-    background-color: var(--azul_institucional);
+    background-color: var(--verde_institucional);
     color: var(--blanco);
 }
 

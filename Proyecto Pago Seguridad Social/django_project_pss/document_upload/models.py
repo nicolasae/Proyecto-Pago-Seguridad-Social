@@ -1,5 +1,9 @@
 from django.db import models
 
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+
+
 # Create your models here.
 class Patronal(models.Model):
     TIPO_CHOICES = (
@@ -115,3 +119,13 @@ class valoresEmpleado(models.Model):
 
     def __str__(self):
         return f"Fecha:{self.fecha} {self.NIT} - Unidad: {self.unidad}"
+
+
+# Definición de la función para manejar el borrado de registros relacionados
+@receiver(pre_delete, sender=infoPlanilla)
+def delete_related_values(sender, instance, **kwargs):
+    valoresPatron.objects.filter(fecha=instance.fecha).delete()
+    valoresEmpleado.objects.filter(fecha=instance.fecha).delete()
+
+# Conexión de la señal
+pre_delete.connect(delete_related_values, sender=infoPlanilla)

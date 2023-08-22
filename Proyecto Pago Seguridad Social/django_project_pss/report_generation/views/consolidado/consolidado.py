@@ -11,7 +11,11 @@ def get_list_entidades():
     
     # Get the complete Entity objects for the unique NITs
     entidades_completas = Entidad.objects.filter(NIT__in=[entidad['NIT'] for entidad in entidades_unicas])
-    entidades_ordenadas = sorted(entidades_completas, key=lambda entidad: PERSONALIZED_ORDER.index(entidad.razonEntidad))
+    # entidades_ordenadas = sorted(entidades_completas, key=lambda entidad: PERSONALIZED_ORDER.index(entidad.razonEntidad))
+    entidades_ordenadas = sorted(
+        entidades_completas,
+        key=lambda entidad: (PERSONALIZED_ORDER.index(entidad.razonEntidad), entidad.tipo)
+    )
 
     return entidades_ordenadas
 

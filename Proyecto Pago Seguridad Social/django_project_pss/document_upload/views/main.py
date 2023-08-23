@@ -82,7 +82,7 @@ def process_document_upload_files(request, data):
                 
                 # Based on the type of form, extract data from the processed csv file and save it.
                 if form_name == 'planilla':
-                    extract_data_for_planilla(path_file_csv, data['selected_year'], data['selected_month'])
+                    extract_data_for_planilla(request,path_file_csv, data['selected_year'], data['selected_month'])
                 if form_name == 'patronalesTemporales':
                     tipo_patronal = 'temporal'
                     extract_data_patronales(request,path_file_csv, data['selected_year'], data['selected_month'], tipo_patronal)

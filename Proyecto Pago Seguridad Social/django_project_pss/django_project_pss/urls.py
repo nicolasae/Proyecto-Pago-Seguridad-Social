@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from .views import *
 
 
-admin.site.index_title = "Bienvenido"
+admin.site.index_title = "Bienvenid@"
 admin.site.site_title = "Admin Portal"
 admin.site.site_header = "Administrador Pago Seguridad Social"
 

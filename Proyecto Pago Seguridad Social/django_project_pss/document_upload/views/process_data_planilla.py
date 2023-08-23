@@ -1,7 +1,11 @@
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+
 from ..models import *
 from .process_data import *
 
-def extract_data_for_planilla(csv_file_path,year,month):
+
+def extract_data_for_planilla(request,csv_file_path,year,month):
     data = read_data_from_csv(csv_file_path)
     
     # Remove empty strings from the list of lists
@@ -16,31 +20,56 @@ def extract_data_for_planilla(csv_file_path,year,month):
     info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
     values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 1,len(cleaned_data) -1 )
     
-    save_db_info_planilla(info_planilla_data,year,month)
+    save_db_info_planilla(request,info_planilla_data,year,month)
     save_db_values_planilla(info_planilla_data,values_planilla_data)
 
-def save_db_info_planilla(data,year=None,month=None):
+def save_db_info_planilla(request,data,year=None,month=None):
     periodo = year + '/' + month
+    numero_planilla = data[8][1]  # Obtener el número de planilla
 
-    perido_pension = data[6][1]  
-    perido_salud = data[7][1] 
+    try:
+        planilla = infoPlanilla.objects.get(numeroPlanilla=numero_planilla)
+        print('numeroPlanilla existe')
+    except infoPlanilla.DoesNotExist:
+        try:
+            planilla = infoPlanilla.objects.get(fecha=periodo)
+            print('fecha periodo existe')
+        except infoPlanilla.DoesNotExist:
+            planilla = None
 
-    planilla = infoPlanilla (
-        razonSocial = 'Rama Judicial',
-        fecha = periodo,
-        identificacion = data[1][1],
-        codigoDependenciaSucursal = data[2][1],
-        nomDependenciaSucursal = data[3][1],
-        fechaReporte = data[4][1],
-        fechaLimitePago = data[5][1],
-        periodoPension = perido_pension,
-        periodoSalud = perido_salud,
-        numeroPlanilla = data[8][1],
-        totalCotizantes = data[9][1],
-        PIN = data[10][1],
-        tipoPlanilla = data[11][1],
-    ) 
-    planilla.save()
+    if planilla:
+        # Update record
+        planilla.razonSocial = 'Rama Judicial'
+        planilla.fecha = periodo
+        planilla.identificacion = data[1][1]
+        planilla.codigoDependenciaSucursal = data[2][1]
+        planilla.nomDependenciaSucursal = data[3][1]
+        planilla.fechaReporte = data[4][1]
+        planilla.fechaLimitePago = data[5][1]
+        planilla.periodoPension = data[6][1]
+        planilla.periodoSalud = data[7][1]
+        planilla.totalCotizantes = data[9][1]
+        planilla.PIN = data[10][1]
+        planilla.tipoPlanilla = data[11][1]
+        planilla.save()
+    else:
+        # Create a new record if it doesn't exist
+        planilla = infoPlanilla(
+            razonSocial='Rama Judicial',
+            fecha=periodo,
+            identificacion=data[1][1],
+            codigoDependenciaSucursal=data[2][1],
+            nomDependenciaSucursal=data[3][1],
+            fechaReporte=data[4][1],
+            fechaLimitePago=data[5][1],
+            periodoPension=data[6][1],
+            periodoSalud=data[7][1],
+            numeroPlanilla=numero_planilla,
+            totalCotizantes=data[9][1],
+            PIN=data[10][1],
+            tipoPlanilla=data[11][1],
+        )
+        planilla.save()
     
 def save_db_values_planilla(info_planilla_data, values_planilla_data):
     numeroPlanilla = info_planilla_data[8][1]
@@ -52,13 +81,13 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
             try:
                 planilla_instance = infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla)
             except infoPlanilla.DoesNotExist:
-                # print(f"Error: No infoPlanilla instance found with number '{numeroPlanilla}'")
+                print(f"Error: No infoPlanilla instance found with number '{numeroPlanilla}'")
                 return
 
             try:
                 entidad_instance = Entidad.objects.get(codigo=codigo_entidad)
             except Entidad.DoesNotExist:
-                # print(f"Warning: No Entidad instance found with codigo '{codigo_entidad}'")
+                print(f"Warning: No Entidad instance found with codigo '{codigo_entidad}'")
                 continue
 
             valores_planilla_instance, created = valoresPlanilla.objects.get_or_create(

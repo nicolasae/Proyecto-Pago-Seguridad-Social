@@ -99,8 +99,21 @@ button.btn-outline-local {
     justify-content: center;
 }
 
+.center-container-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-container-img img {
+    width: 300px;
+}
+
 @media (min-width: 768px) {
     .cuerpo-contenido {
         padding: 30px 30px;
+    }
+    .center-container-img img {
+        width: auto;
     }
 }

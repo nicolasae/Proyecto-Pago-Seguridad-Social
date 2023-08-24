@@ -18,11 +18,22 @@ body , a {
     background-color: var(--verde_institucional);
 }
 
-.cuerpo-contenido {
-    max-width: 1920px;
-    margin: 0 auto;
-    padding: 20px;
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+
+.cuerpo-contenido {
+    flex: 1;
+    max-width: 1920px;
+    /* margin: 0 auto; */
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .cuerpo-contenido a {
     text-decoration: none;
 }
@@ -83,10 +94,16 @@ button.navbar-toggler{
 
 .btn-outline-local:hover{
     background-color: var(--verde_institucional);
-    color: var(--blanco);
+    color: var(--blanco);    
 }
 
-button.btn-outline-local {
+.btn-local:hover{
+    background-color: var(--blanco);
+    color: var(--verde_institucional);
+    border: 1px solid var(--verde_institucional);
+}
+
+button.btn-outline-local, button.btn-local {
     width: 250px;
 }
 
@@ -107,6 +124,14 @@ button.btn-outline-local {
 
 .center-container-img img {
     width: 300px;
+}
+
+.footer-container {
+    background-color: gray;   
+}
+
+.footer-container span {
+    color: white;
 }
 
 @media (min-width: 768px) {

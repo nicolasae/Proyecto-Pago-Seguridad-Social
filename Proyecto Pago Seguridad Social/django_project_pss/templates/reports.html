@@ -11,18 +11,19 @@
     </section>
 
     <main class="cuerpo-contenido">          
-        <h1> Generar Reporte</h1>
-
-        {% if show_alert %}
-            <div id="messages">
-                <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
-                    <strong>{{ message }}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        {% endif %}     
         
         <form  method="post" action="{% url 'descargar' %}">
+            <h1>Generar Reportes</h1>
+    
+            {% if show_alert %}
+                <div id="messages">
+                    <div class="alert alert-{{ alert_type }} alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endif %} 
+
             {% csrf_token %}
 
             <section class="d-flex row">
@@ -53,35 +54,41 @@
             
             <section class="d-flex row justify-content-center btn-group mt-4">
                 <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
-                    <button type="submit" class="btn-outline-local" name="btn_resumen_planilla">
+                    <button type="submit" class="btn-local" name="btn_resumen_planilla">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
                         Reporte Planilla
                     </button>                    
                 </div>
                 <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
-                    <button type="submit" class="btn-outline-local" name="btn_resumen_patronales">
+                    <button type="submit" class="btn-local" name="btn_resumen_patronales">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
                         Reporte Patronales
                     </button>
                 </div>
                 <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
-                    <button type="submit" class="btn-outline-local" name="btn_resumen_deducciones">
+                    <button type="submit" class="btn-local" name="btn_resumen_deducciones">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
                         Reporte Deducciones
                     </button>
                 </div>
                 <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
-                    <button type="submit" class="btn-outline-local" name="btn_consolidado">
+                    <button type="submit" class="btn-local" name="btn_consolidado">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
                         Reporte Consolidado
                     </button>
                 </div>                                                                                                                                                                  
             </section>
             <section class="d-flex row justify-content-center btn-group mt-4">
                 <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
-                    <button class="btn-outline-local" name="btn_descargar">
+                    <button class="btn-local" name="btn_descargar">
+                        <i class="bi bi-download"></i>
                         Descargar documentos
                     </button>
                 </div> 
                 <div class="col-12 col-sm-6 col-xl-3 boton-centrado">
                     <a href="/documentos/subir/">
-                        <button type="button" class="btn-outline-local">
+                        <button type="button" class="btn-local">
+                            <i class="bi bi-upload"></i>
                             Subir documentos 
                         </button>
                     </a>                    
@@ -89,6 +96,9 @@
             </section>
         </form>
     </main>
+
+    <!-- Footer -->
+    {% include "footer.html" %} 
 
     <script>
         // Get references to the select elements

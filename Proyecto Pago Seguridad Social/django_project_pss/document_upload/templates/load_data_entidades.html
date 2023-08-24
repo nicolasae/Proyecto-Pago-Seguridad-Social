@@ -4,55 +4,67 @@
 
 {% block content %}
 
-{% include "navbar.html" %}
+{% load static %}
 
-<main class="cuerpo-contenido">
-    <h1>Datos entidades</h1>
+<section class="row-cabecera">
+    {% include "navbar.html" %}
+</section>
 
-    {% if messages %}
-        <div id="messages">
-            {% for message in messages %}            
-                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
-                    <strong>{{ message }}</strong> 
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}        
-        </div>
-       
-    {% endif %}
-
+<main class="cuerpo-contenido">        
+    
     <form method="post" enctype="multipart/form-data">
+        <h1>Datos entidades</h1>
+    
+        {% if messages %}
+            <div id="messages">
+                {% for message in messages %}            
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong> 
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}        
+            </div>
+           
+        {% endif %}
+
+
         {% csrf_token %}
+        
         <div class="my-4">
             <label for="formFile" class="form-label">Seleccione Archivo</label>
             <input class="form-control" type="file" name="formFile" id="formFile">
         </div>
 
         <section class="d-flex row justify-content-center btn-group mt-3">
-            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
-                <button type="submit" class="btn-outline-local">
+            <div class="col-12 col-md-6 d-flex justify-content-center">
+                <button type="submit" class="btn-local">
+                    <i class="bi bi-upload"></i>
                     Cargar Información
                 </button>
             </div>
-            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
+            <div class="col-12 col-md-6 d-flex justify-content-center">
                 <a href="/media/datos_entidades.xlsx" download>
-                    <button type="button" class="btn-outline-local">
+                    <button type="button" class="btn-local">
+                        <i class="bi bi-download"></i>
                         Descargar Información 
                     </button>
                 </a>
             </div>
-            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
+            <!-- <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center">
                 <a href="/documentos/listar/entidades">
-                    <button type="button" class="btn-outline-local">
+                    <button type="button" class="btn-local">
+                        <i class="bi bi-list"></i>
                         Listar Entidades
                     </button>
                 </a>
-            </div>
+            </div> -->
         </section>
-
     </form>
 
 </main>
+
+<!-- Footer -->
+{% include "footer.html" %} 
 
 <script>
     setTimeout(function() {

@@ -11,9 +11,9 @@
     </section>
 
     <main class="cuerpo-contenido">       
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div class="center-container-img">
+        <div class="col-12">
+            <div class="row justify-content-center">
+                <div class="center-container-img mb-3">
                     <img src="{% static 'images/Logo CSJ.png' %}" class="" alt="Logo Rama Judicial">
                 </div>
                 <div class="text-center mt-3 mt-sm-3">
@@ -24,23 +24,26 @@
                         
                         <div class="col-12 col-sm-6 col-xl-3">
                             <a href="/documentos/subir">
-                                <button type="button" class="btn-outline-local">
-                                    Subir información
+                                <button type="button" class="btn-local w-100">
+                                    <i class="bi bi-cloud-upload"></i>
+                                    <span>Subir documentos pago</span>
                                 </button>
                             </a>
                         </div>
 
                         <div class="col-12 col-sm-6 col-xl-3">
                             <a href="/documentos/subir/entidades">
-                                <button type="button" class="btn-outline-local">
-                                    Subir información entidades
+                                <button type="button" class="btn-local w-100">
+                                    <i class="bi bi-cloud-upload"></i>
+                                    <span>Subir información entidades</span>
                                 </button>
                             </a>
                         </div>
                         <div class="col-12 col-sm-6 col-xl-3">
                             <a href="/reportes/">
-                                <button type="button" class="btn-outline-local">
-                                    Generar Informes  
+                                <button type="button" class="btn-local w-100">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span>Generar Informes</span>  
                                 </button>
                             </a>
                         </div>                        
@@ -51,5 +54,8 @@
             </div>
         </div>
     </main>
+
+    <!-- Footer -->
+    {% include "footer.html" %} 
 
 {% endblock %}

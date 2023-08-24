@@ -6,9 +6,9 @@
 
 {% include "navbar.html" %}
 
-<div class="container my-5">
+<main class="cuerpo-contenido row">
     <h1>Lista Entidades</h1>
-    <table class="table table-striped" id="entity-table" style="width: 100%;">
+    <table class="table table-striped" id="entity-table">
         <thead>
             <tr>
                 <th>NIT</th>
@@ -34,7 +34,10 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
+</main>
+
+<!-- Footer -->
+{% include "footer.html" %} 
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

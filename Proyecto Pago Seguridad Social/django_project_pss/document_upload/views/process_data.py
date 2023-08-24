@@ -3,8 +3,6 @@ import pandas as pd
 import csv
 import shutil
 
-from datetime import datetime
-
 from ..models import *
 
 def converter_xlsx_to_csv( folder_path_xlsx, folder_path_csv):

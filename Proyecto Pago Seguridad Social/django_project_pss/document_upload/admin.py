@@ -15,7 +15,7 @@ class InfoPlanillaSearchFilter(admin.ModelAdmin):
 
 class ValoresPlanillaSearchFilter(admin.ModelAdmin):
     search_fields = ['codigoEntidad__razonEntidad', 'NIT', 'numeroPlanilla__numeroPlanilla','numeroPlanilla__fecha']
-    list_display = ('codigoEntidad', 'NIT', 'numeroPlanilla')
+    list_display = ('codigoEntidad','numeroPlanilla')
 
 class ValoresEmpleadoSearchFilter(admin.ModelAdmin):
     search_fields = ['NIT__NIT','fecha','unidad']

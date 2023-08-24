@@ -1,5 +1,3 @@
-from django.db.models import Q
-
 from ..models import *
 from .process_data import *
 

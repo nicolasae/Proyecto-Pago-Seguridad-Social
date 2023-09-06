@@ -15,14 +15,16 @@ def get_data_deducciones(date):
 
     for motivo in motivos_ordenados:
         NIT = motivo.NIT.NIT
-        rubro = motivo.NIT.rubro
+        rubroTemporal = motivo.NIT.rubroTemporal
+        rubroPermanente = motivo.NIT.rubroPermanente
         concepto = motivo.NIT.concepto
         unidad = motivo.unidad
 
         # # Check if an entry for the NIT already exists in the dictionary
         if NIT not in data_dict:
             data_dict[NIT] = {
-                'RUBRO': rubro,
+                'RUBRO TEMPORAL': rubroTemporal,
+                'RUBRO PERMANENTE': rubroPermanente,
                 'CONCEPTO': concepto,
                 'UNIDAD 2': 0,
                 'UNIDAD 8': 0,
@@ -57,20 +59,21 @@ def save_data_deducciones(sheet,data):
         suma_unidad9 += item['UNIDAD 9']
         
         sheet[f"A{current_row}"] = nit
-        sheet[f"B{current_row}"] = item['RUBRO']
-        sheet[f"C{current_row}"] = item['CONCEPTO']
-        sheet[f"D{current_row}"] = item['UNIDAD 2']
-        sheet[f"E{current_row}"] = item['UNIDAD 8']
-        sheet[f"F{current_row}"] = item['UNIDAD 9']
-        sheet[f"G{current_row}"] = item['TOTAL']
+        sheet[f"B{current_row}"] = item['RUBRO TEMPORAL']
+        sheet[f"C{current_row}"] = item['RUBRO PERMANENTE']
+        sheet[f"D{current_row}"] = item['CONCEPTO']
+        sheet[f"E{current_row}"] = item['UNIDAD 2']
+        sheet[f"F{current_row}"] = item['UNIDAD 8']
+        sheet[f"G{current_row}"] = item['UNIDAD 9']
+        sheet[f"H{current_row}"] = item['TOTAL']
         
         # Add format styles 
-        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G','H']
 
         for col in columns_to_style:
             cell = f"{col}{current_row}"
 
-            if col in ['D','E', 'F','G']:
+            if col in ['E', 'F','G','H']:
                 sheet[cell].style = currency_style 
             sheet[cell].font = font_style
             sheet[cell].border = border_style
@@ -82,6 +85,7 @@ def save_data_deducciones(sheet,data):
     total_data = [
         "",  
         "A0102..",
+        "A0101..",
         "TOTAL",
         suma_unidad2,
         suma_unidad8,

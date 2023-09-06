@@ -48,7 +48,7 @@ def save_data_temporales(sheet, date):
     for entidad in entidades:
         nit = entidad.NIT 
         nit_data[nit] = {
-            'rubro': entidad.rubro,
+            'rubro': entidad.rubroTemporal,
             'concepto': entidad.concepto,
             'tipoCuentaPagar':entidad.tipoCuentaPagar,
             'codigoDescuento': entidad.codigoDescuento,
@@ -60,7 +60,7 @@ def save_data_temporales(sheet, date):
 
     for entidad in data:
         if entidad.NIT.NIT in nit_data:
-            nit_data[entidad.NIT.NIT]['rubro'] = entidad.NIT.rubro
+            nit_data[entidad.NIT.NIT]['rubro'] = entidad.NIT.rubroTemporal
             nit_data[entidad.NIT.NIT]['concepto'] = entidad.NIT.concepto
             nit_data[entidad.NIT.NIT]['tipoCuentaPagar'] = entidad.NIT.tipoCuentaPagar
             nit_data[entidad.NIT.NIT]['codigoDescuento'] = entidad.NIT.codigoDescuento
@@ -70,7 +70,7 @@ def save_data_temporales(sheet, date):
         else:
             # Store information for NITs that are not in data
             nit_data[entidad.NIT.NIT] = {
-                'rubro': entidad.NIT.rubro,
+                'rubro': entidad.NIT.rubroTemporal,
                 'concepto': entidad.NIT.concepto,
                 'tipoCuentaPagar': entidad.NIT.tipoCuentaPagar,
                 'codigoDescuento': entidad.NIT.codigoDescuento,

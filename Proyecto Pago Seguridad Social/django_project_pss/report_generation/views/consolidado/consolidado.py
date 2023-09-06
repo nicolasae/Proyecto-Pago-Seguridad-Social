@@ -23,7 +23,8 @@ def process_data_empleados(data):
     for entidad in entidades:
         nit = entidad.NIT
         data_dict[nit] = {
-            'RUBRO': entidad.rubro,
+            'RUBRO TEMPORAL': entidad.rubroTemporal,
+            'RUBRO PERMANENTE': entidad.rubroPermanente,
             'CONCEPTO': entidad.concepto,
             'UNIDAD 2': 0,
             'UNIDAD 8': 0,
@@ -33,14 +34,16 @@ def process_data_empleados(data):
 
     for motivo in data:
         NIT = motivo.NIT.NIT
-        rubro = motivo.NIT.rubro
+        rubroTemporal = motivo.NIT.rubroTemporal
+        rubroPermanente = motivo.NIT.rubroPermanente
         concepto = motivo.NIT.concepto
         unidad = motivo.unidad
 
         # # Check if an entry for the NIT already exists in the dictionary
         if NIT not in data_dict:
             data_dict[NIT] = {
-                'RUBRO': rubro,
+                'RUBRO TEMPORAL': rubroTemporal,
+                'RUBRO PERMANENTE': rubroPermanente,
                 'CONCEPTO': concepto,
                 'UNIDAD 2': 0,
                 'UNIDAD 8': 0,
@@ -69,7 +72,8 @@ def process_data_patron(data):
     for entidad in entidades:
         nit = entidad.NIT
         data_dict[nit] = {
-            'RUBRO': entidad.rubro,
+            'RUBRO TEMPORAL': entidad.rubroTemporal,
+            'RUBRO PERMANENTE': entidad.rubroPermanente,
             'CONCEPTO': entidad.concepto,
             'CODIGO DEL CONCEPTO DE DESCUENTO': entidad.codigoDescuento,
             'TEMPORAL UN 2': 0,
@@ -84,7 +88,8 @@ def process_data_patron(data):
     for motivo in data:
         NIT = motivo.NIT.NIT
         tipo_patronal = motivo.tipoPatronal.tipo
-        rubro = motivo.NIT.rubro
+        rubroTemporal = motivo.NIT.rubroTemporal
+        rubroPermanente = motivo.NIT.rubroPermanente
         concepto = motivo.NIT.concepto
         codigo_descuento = motivo.NIT.codigoDescuento
         total = motivo.total
@@ -92,7 +97,8 @@ def process_data_patron(data):
         # Check if an entry for the NIT already exists in the dictionary
         if NIT not in data_dict:
             data_dict[NIT] = {
-                'RUBRO': rubro,
+                'RUBRO TEMPORAL': rubroTemporal,
+                'RUBRO PERMANENTE': rubroPermanente,
                 'CONCEPTO': concepto,
                 'CODIGO DEL CONCEPTO DE DESCUENTO': codigo_descuento,
                 'TEMPORAL UN 2': 0,
@@ -216,29 +222,30 @@ def save_data(sheet,data):
         sum_subtotales[12] += convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
     
         sheet[f"A{current_row}"] = entidad.NIT
-        sheet[f"B{current_row}"] = entidad.rubro
-        sheet[f"C{current_row}"] = entidad.concepto
-        sheet[f"D{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2')) 
-        sheet[f"E{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))        
-        sheet[f"F{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9')) 
-        sheet[f"G{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
-        sheet[f"H{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
-        sheet[f"I{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
-        sheet[f"J{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9'))
-        sheet[f"K{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2')) 
-        sheet[f"L{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8')) 
-        sheet[f"M{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9')) 
-        sheet[f"N{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TOTAL')) 
-        sheet[f"O{current_row}"] = sum_subtotales[11]
-        sheet[f"P{current_row}"] = convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
+        sheet[f"B{current_row}"] = entidad.rubroTemporal
+        sheet[f"C{current_row}"] = entidad.rubroPermanente
+        sheet[f"D{current_row}"] = entidad.concepto
+        sheet[f"E{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 2')) 
+        sheet[f"F{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 8'))        
+        sheet[f"G{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('UNIDAD 9')) 
+        sheet[f"H{current_row}"] = convert_empty_to_zero(item.get('empleado', {}).get('TOTAL'))
+        sheet[f"I{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 2')) 
+        sheet[f"J{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 8')) 
+        sheet[f"K{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TEMPORAL UN 9'))
+        sheet[f"L{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 2')) 
+        sheet[f"M{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 8')) 
+        sheet[f"N{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('PERMANENTE UN 9')) 
+        sheet[f"O{current_row}"] = convert_empty_to_zero(item.get('patron', {}).get('TOTAL')) 
+        sheet[f"P{current_row}"] = sum_subtotales[11]
+        sheet[f"Q{current_row}"] = convert_empty_to_zero(item.get('planilla', {}).get('VALOR'))
 
         # Add format styles 
-        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K','L','M','N','O','P']
+        columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J','K','L','M','N','O','P','Q']
 
         for col in columns_to_style:
             cell = f"{col}{current_row}"
 
-            if col in ['D', 'E', 'F','G', 'H','I','J','K','L','M','N','O','P']:
+            if col in ['E', 'F','G', 'H','I','J','K','L','M','N','O','P','Q']:
                 sheet[cell].style = currency_style 
             sheet[cell].font = font_style
             sheet[cell].border = border_style
@@ -261,17 +268,17 @@ def save_data(sheet,data):
 
 def add_subtotal(sheet, sum_subtotales, current_row, tipo_entidad):      
     # Add the subtotal cells and apply the style
-    sheet[f"B{current_row}"] = "SUBTOTAL"
-    sheet[f"C{current_row}"] = tipo_entidad
+    sheet[f"C{current_row}"] = "SUBTOTAL"
+    sheet[f"D{current_row}"] = tipo_entidad
     
-    sheet[f"B{current_row}"].font = header_style
-    sheet[f"B{current_row}"].border = border_style
     sheet[f"C{current_row}"].font = header_style
     sheet[f"C{current_row}"].border = border_style
+    sheet[f"D{current_row}"].font = header_style
+    sheet[f"D{current_row}"].border = border_style
 
     for col_index, value in enumerate(sum_subtotales):
-        col_letter = chr(ord('D') + col_index) 
-        if ( col_letter != 'P'):
+        col_letter = chr(ord('E') + col_index) 
+        if ( col_letter != 'Q'):
             sheet[f"{col_letter}{current_row}"] = value
             sheet[f"{col_letter}{current_row}"].style = currency_style
             sheet[f"{col_letter}{current_row}"].font = header_style
@@ -285,6 +292,7 @@ def add_totales(sheet, data, current_row):
     total_data = [
         "supernume",
         "A0102..",
+        "A0101..",
         "TOTAL",
         data[0],
         data[1],

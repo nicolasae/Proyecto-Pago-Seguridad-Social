@@ -170,7 +170,7 @@ def generate_excel_report(data, year, month):
 
     # Create the HTTP response and return the file for download
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="Reporte Final-{year}-{month}.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="Consolidado-{year}-{month}.xlsx"'
     workbook.save(response)
 
     return response

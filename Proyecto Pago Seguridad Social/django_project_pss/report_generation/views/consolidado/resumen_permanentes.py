@@ -1,4 +1,5 @@
 from document_upload.models import *
+from django.db.models import Sum
 
 from ..functions import *
 from ..constants import *
@@ -29,15 +30,21 @@ def get_data_permanentes(date):
     data_organized = sorted(data, key=lambda item: PERSONALIZED_ORDER.index(item.NIT.razonEntidad))
     return data_organized
 
-
 def save_data_permanentes(sheet, date):
     data = get_data_permanentes(date)
     numero_planilla = get_number_planilla(date)
     entidades = get_list_entidades()
-
+    
     suma_unidad2 = 0
     suma_unidad8 = 0
     suma_unidad9 = 0
+
+    suma_salud_un2 = 0
+    suma_salud_un8 = 0
+    suma_salud_un9 = 0
+    suma_pension_un2 = 0
+    suma_pension_un8 = 0
+    suma_pension_un9 = 0
 
     sheet[f"C{1}"] = numero_planilla
 
@@ -50,8 +57,9 @@ def save_data_permanentes(sheet, date):
         nit_data[nit] = {
             'rubro': entidad.rubroPermanente,
             'concepto': entidad.concepto,
-            'tipoCuentaPagar':entidad.tipoCuentaPagar,
+            'tipoCuentaPagar': entidad.tipoCuentaPagar,
             'codigoDescuento': entidad.codigoDescuento,
+            'razonEntidad': entidad.razonEntidad,
             'unidad2': 0,
             'unidad8': 0,
             'unidad9': 0
@@ -64,6 +72,7 @@ def save_data_permanentes(sheet, date):
             nit_data[entidad.NIT.NIT]['concepto'] = entidad.NIT.concepto
             nit_data[entidad.NIT.NIT]['tipoCuentaPagar'] = entidad.NIT.tipoCuentaPagar
             nit_data[entidad.NIT.NIT]['codigoDescuento'] = entidad.NIT.codigoDescuento
+            nit_data[entidad.NIT.NIT]['razonEntidad'] = entidad.NIT.razonEntidad
             nit_data[entidad.NIT.NIT]['unidad2'] += entidad.unidad2
             nit_data[entidad.NIT.NIT]['unidad8'] += entidad.unidad8
             nit_data[entidad.NIT.NIT]['unidad9'] += entidad.unidad9
@@ -74,11 +83,12 @@ def save_data_permanentes(sheet, date):
                 'concepto': entidad.NIT.concepto,
                 'tipoCuentaPagar': entidad.NIT.tipoCuentaPagar,
                 'codigoDescuento': entidad.NIT.codigoDescuento,
+                'razonEntidad': entidad.NIT.razonEntidad,
                 'unidad2': 0,
                 'unidad8': 0,
                 'unidad9': 0
             }
-
+    
     # Write the data to the Excel sheet
     row_index = 3
     for nit, data in nit_data.items():
@@ -106,29 +116,67 @@ def save_data_permanentes(sheet, date):
         suma_unidad8 += data['unidad8']
         suma_unidad9 += data['unidad9']
 
+        if ( data['razonEntidad'] == 'SALUD'):
+            suma_salud_un2 += data['unidad2']
+            suma_salud_un8 += data['unidad8']
+            suma_salud_un9 += data['unidad9']
+
+        if ( data['razonEntidad'] == 'PENSION'):
+            suma_pension_un2 += data['unidad2']
+            suma_pension_un8 += data['unidad8']
+            suma_pension_un9 += data['unidad9']
+
         row_index += 1
-
-    # Write the total sums to the Excel sheet
-    total_data = [
-        "supernume",  
-        "A0102..",
-        "TOTAL",
-        "",
-        "",        
-        0,
-        0,
-        0,
-        suma_unidad2,
-        suma_unidad8,
-        suma_unidad9
-    ]
     
-    for col_idx, value in enumerate(total_data, start=1):
-        cell = sheet.cell(row=row_index, column=col_idx, value=value)
-        if col_idx > 4:
-            cell.style = currency_style
-        cell.font = header_style
-        cell.border = border_style
+    data = [
+        [
+            "supernume",  
+            "A0102..",
+            "TOTAL",
+            "",
+            "",        
+            0,
+            0,
+            0,
+            suma_unidad2,
+            suma_unidad8,
+            suma_unidad9
+        ],
+        [
+            "",  
+            "",
+            "SUBTOTAL SALUD",
+            "",
+            "",        
+            0,
+            0,
+            0,
+            suma_salud_un2,
+            suma_salud_un8,
+            suma_salud_un9
+        ],
+        [
+            "",  
+            "",
+            "SUBTOTAL PENSION",
+            "",
+            "",        
+            0,
+            0,
+            0,
+            suma_pension_un2,
+            suma_pension_un8,
+            suma_pension_un9
+        ]
+    ]
 
+    # Define el número de filas que se deben agregar
+    num_filas = 3
 
-  
+    for idx, row_data in enumerate(data, start=row_index):
+        for col_idx, value in enumerate(row_data, start=1):
+            cell = sheet.cell(row=idx, column=col_idx, value=value)
+            if col_idx > 4:
+                cell.style = currency_style
+            cell.font = header_style
+            cell.border = border_style

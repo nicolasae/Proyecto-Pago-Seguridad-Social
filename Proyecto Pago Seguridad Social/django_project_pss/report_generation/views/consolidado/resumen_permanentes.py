@@ -116,12 +116,12 @@ def save_data_permanentes(sheet, date):
         suma_unidad8 += data['unidad8']
         suma_unidad9 += data['unidad9']
 
-        if ( data['razonEntidad'] == 'SALUD'):
+        if ( data['razonEntidad'] == 'SALUD' ):
             suma_salud_un2 += data['unidad2']
             suma_salud_un8 += data['unidad8']
             suma_salud_un9 += data['unidad9']
 
-        if ( data['razonEntidad'] == 'PENSION'):
+        if ( data['razonEntidad'] == 'PENSION' ):
             suma_pension_un2 += data['unidad2']
             suma_pension_un8 += data['unidad8']
             suma_pension_un9 += data['unidad9']
@@ -135,9 +135,9 @@ def save_data_permanentes(sheet, date):
             "TOTAL",
             "",
             "",        
-            0,
-            0,
-            0,
+            "",
+            "",
+            "",
             suma_unidad2,
             suma_unidad8,
             suma_unidad9
@@ -145,29 +145,29 @@ def save_data_permanentes(sheet, date):
         [
             "",  
             "",
-            "SUBTOTAL SALUD",
+            "SUBTOTAL PENSION",
             "",
             "",        
-            0,
-            0,
-            0,
-            suma_salud_un2,
-            suma_salud_un8,
-            suma_salud_un9
+            "",
+            "",
+            "",
+            suma_pension_un2,
+            suma_pension_un8,
+            suma_pension_un9
         ],
         [
             "",  
             "",
-            "SUBTOTAL PENSION",
+            "SUBTOTAL SALUD",
             "",
             "",        
-            0,
-            0,
-            0,
-            suma_pension_un2,
-            suma_pension_un8,
-            suma_pension_un9
-        ]
+            "",
+            "",
+            "",
+            suma_salud_un2,
+            suma_salud_un8,
+            suma_salud_un9
+        ]        
     ]
 
     # Define el número de filas que se deben agregar

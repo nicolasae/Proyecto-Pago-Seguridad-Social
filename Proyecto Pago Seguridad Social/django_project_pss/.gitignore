@@ -173,6 +173,5 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
-
-document_upload/migrations
+document_upload/migrations/
 django_project_pss/database_credentials.py

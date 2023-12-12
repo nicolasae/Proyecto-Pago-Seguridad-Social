@@ -35,7 +35,7 @@ def save_db_info_planilla(request,data,year=None,month=None):
             print('fecha periodo existe')
         except infoPlanilla.DoesNotExist:
             planilla = None
-
+    print(data)
     if planilla:
         # Update record
         planilla.razonSocial = 'Rama Judicial'

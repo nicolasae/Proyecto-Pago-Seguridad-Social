@@ -10,7 +10,7 @@ def extract_data_for_planilla(request,csv_file_path,year,month):
     # Remove empty strings from the list of lists
     cleaned_data = [[item for item in row if item.strip()] for row in data]
 
-    first_search_word = 'RAZON SOCIAL'
+    first_search_word = 'RAZÓN SOCIAL'
     second_search_word = 'TIPO DE PLANILLA'
 
     min_index = find_index_of_row_by_partial_word(cleaned_data, first_search_word)
@@ -35,7 +35,7 @@ def save_db_info_planilla(request,data,year=None,month=None):
             print('fecha periodo existe')
         except infoPlanilla.DoesNotExist:
             planilla = None
-    print(data)
+    # print(data)
     if planilla:
         # Update record
         planilla.razonSocial = 'Rama Judicial'

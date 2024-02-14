@@ -72,7 +72,6 @@ class valoresPlanilla(models.Model):
     fondoSolidaridad = models.IntegerField(default=0)
     fondoSubsistencia = models.IntegerField(default=0)
     totalIntereses = models.IntegerField(default=0)
-    valorPagarSinIntereses = models.IntegerField(default=0)
     valorPagar = models.IntegerField(default=0)
 
     class Meta:

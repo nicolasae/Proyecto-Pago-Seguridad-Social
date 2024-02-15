@@ -17,10 +17,7 @@ def extract_data_for_planilla(request,csv_file_path,year,month):
     min_index = find_index_of_row_by_partial_word(cleaned_data, first_search_word)
     max_index = find_index_of_row_by_partial_word(cleaned_data, second_search_word)
     max_index_totales = find_index_of_row_by_partial_word(cleaned_data, third_search_word)
-    print(min_index)
-    print(max_index)
-    print(max_index_totales)
-  
+      
     info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
     values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 2,max_index_totales - 2)
 
@@ -70,9 +67,7 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
     for array in values_planilla_data[1:]:
     #     # if len(array) >= 9:
         codigo_entidad = array[3]
-        valor_total = array[15]                           
-        print(codigo_entidad)
-        print(valor_total)   
+        valor_total = array[16] 
         try:
             planilla_instance = infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla)
         except infoPlanilla.DoesNotExist:

@@ -10,23 +10,30 @@ def extract_data_for_planilla(request,csv_file_path,year,month):
     # Remove empty strings from the list of lists
     cleaned_data = [[item for item in row if item.strip()] for row in data]
 
-    first_search_word = 'DATOS GENERALES DEL APORTANTE'
-    second_search_word = 'VALORES PLANILLA'
-    third_search_word = 'Totales por Sistema'
+    first_search_word = 'Datos del Aportante'
+    second_search_word = 'Totales de la planilla por administradora'
+    third_search_word = 'TOTALES'
 
     min_index = find_index_of_row_by_partial_word(cleaned_data, first_search_word)
     max_index = find_index_of_row_by_partial_word(cleaned_data, second_search_word)
     max_index_totales = find_index_of_row_by_partial_word(cleaned_data, third_search_word)
-      
-    info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
-    values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 2,max_index_totales - 2)
+    
+    # print(min_index)
+    # print(max_index)
+    # print(max_index_totales)
 
-    save_db_info_planilla(request,info_planilla_data[3],year,month)
-    save_db_values_planilla(info_planilla_data,values_planilla_data)
+    info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
+    print(info_planilla_data)
+    # values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 2,max_index_totales - 2)
+    save_db_info_planilla(request,info_planilla_data,year,month)
+    # save_db_values_planilla(info_planilla_data,values_planilla_data)
 
 def save_db_info_planilla(request,data,year=None,month=None):
     periodo = year + '/' + month
-    numero_planilla = data[11]  # Obtener el número de planilla
+    numero_planilla = data[7][0]  # Obtener el número de planilla
+
+    fecha_limite = data[7][4].replace('/','-')
+    print(fecha_limite)
     try:
         planilla = infoPlanilla.objects.get(numeroPlanilla=numero_planilla)
         print('numeroPlanilla existe')
@@ -39,24 +46,24 @@ def save_db_info_planilla(request,data,year=None,month=None):
     
     if planilla:
         # Update record
-        planilla.razonSocial = data[3]
+        planilla.razonSocial = data[3][3]
         planilla.fecha = periodo
-        planilla.identificacion = data[1]
-        planilla.fechaLimitePago = data[15]
-        planilla.periodoPension = data[13]
-        planilla.periodoSalud = data[14]
-        planilla.tipoPlanilla = data[12]
+        planilla.identificacion = data[3][1]
+        planilla.fechaLimitePago = fecha_limite
+        planilla.periodoPension = data[7][2]
+        planilla.periodoSalud = data[7][3]
+        planilla.tipoPlanilla = data[7][1]
         planilla.save()
     else:
         # Create a new record if it doesn't exist
         planilla = infoPlanilla(
-            razonSocial = data[3],
+            razonSocial = data[3][3],
             fecha = periodo,
-            identificacion = data[1],
-            fechaLimitePago = data[15],
-            periodoPension = data[13],
-            periodoSalud = data[14],
-            tipoPlanilla = data[12],
+            identificacion = data[3][1],
+            fechaLimitePago = fecha_limite,
+            periodoPension = data[7][2],
+            periodoSalud = data[7][3],
+            tipoPlanilla = data[7][1],
             numeroPlanilla = numero_planilla,
         )
         planilla.save()

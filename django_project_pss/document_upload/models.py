@@ -68,10 +68,8 @@ class valoresPlanilla(models.Model):
     codigoEntidad = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     NIT = models.CharField(max_length=50)
     numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
-    numeroAfiliados = models.IntegerField()
     fondoSolidaridad = models.IntegerField(default=0)
     fondoSubsistencia = models.IntegerField(default=0)
-    totalIntereses = models.IntegerField(default=0)
     valorPagar = models.IntegerField(default=0)
 
     class Meta:

@@ -1,8 +1,5 @@
-from django.contrib import messages
-
 from ..models import *
 from .process_data import *
-
 
 def extract_data_for_planilla(request,csv_file_path,year,month):
     data = read_data_from_csv(csv_file_path)
@@ -18,22 +15,16 @@ def extract_data_for_planilla(request,csv_file_path,year,month):
     max_index = find_index_of_row_by_partial_word(cleaned_data, second_search_word)
     max_index_totales = find_index_of_row_by_partial_word(cleaned_data, third_search_word)
     
-    # print(min_index)
-    # print(max_index)
-    # print(max_index_totales)
-
     info_planilla_data = split_data_by_index_range(cleaned_data, min_index, max_index)
-    print(info_planilla_data)
-    # values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 2,max_index_totales - 2)
+    values_planilla_data = split_data_by_index_range(cleaned_data, max_index + 3,max_index_totales - 1)
+
     save_db_info_planilla(request,info_planilla_data,year,month)
-    # save_db_values_planilla(info_planilla_data,values_planilla_data)
+    save_db_values_planilla(info_planilla_data,values_planilla_data)
 
 def save_db_info_planilla(request,data,year=None,month=None):
     periodo = year + '/' + month
-    numero_planilla = data[7][0]  # Obtener el número de planilla
-
+    numero_planilla = data[7][0]
     fecha_limite = data[7][4].replace('/','-')
-    print(fecha_limite)
     try:
         planilla = infoPlanilla.objects.get(numeroPlanilla=numero_planilla)
         print('numeroPlanilla existe')
@@ -69,12 +60,12 @@ def save_db_info_planilla(request,data,year=None,month=None):
         planilla.save()
     
 def save_db_values_planilla(info_planilla_data, values_planilla_data):
-    numeroPlanilla = info_planilla_data[3][11]
+    numeroPlanilla = info_planilla_data[7][0]
 
-    for array in values_planilla_data[1:]:
-    #     # if len(array) >= 9:
-        codigo_entidad = array[3]
+    for array in values_planilla_data[0:]:
+        codigo_entidad = array[4]
         valor_total = array[16] 
+
         try:
             planilla_instance = infoPlanilla.objects.get(numeroPlanilla=numeroPlanilla)
         except infoPlanilla.DoesNotExist:
@@ -91,21 +82,17 @@ def save_db_values_planilla(info_planilla_data, values_planilla_data):
             numeroPlanilla=planilla_instance,
             codigoEntidad=entidad_instance,
             defaults={
-                'NIT': array[0],
-                'numeroAfiliados': array[4],
+                'NIT': array[1],
                 'fondoSolidaridad': array[6],
                 'fondoSubsistencia': array[7],
-                'totalIntereses': array[11],
                 'valorPagar': valor_total,
             }
         )
 
         if not created:
             valores_planilla_instance.NIT = array[1]
-            valores_planilla_instance.numeroAfiliados = array[4]
-            valores_planilla_instance.fondoSolidaridad = array[5]
-            valores_planilla_instance.fondoSubsistencia = array[6]
-            valores_planilla_instance.totalIntereses = array[10]
+            valores_planilla_instance.fondoSolidaridad = array[6]
+            valores_planilla_instance.fondoSubsistencia = array[7]
             valores_planilla_instance.valorPagar = valor_total
             valores_planilla_instance.save()
         # else:

@@ -15,7 +15,7 @@ class Patronal(models.Model):
 
     def __str__(self):
         return f"Tipo: {self.tipo}"
-    
+
 class Gasto(models.Model):
     TIPO_CHOICES = (
         ('contribuciones', 'Contribuciones efectivas'),
@@ -47,20 +47,15 @@ class Entidad(models.Model):
 
     def __str__(self):
         return f"NIT: {self.NIT} - {self.concepto} - Razón Entidad: {self.razonEntidad}"
-   
+
 class infoPlanilla(models.Model):
     numeroPlanilla = models.CharField(max_length=100, primary_key=True)
     razonSocial = models.CharField(max_length=100, default="Rama Judicial")
-    fecha = models.CharField(max_length=10,default='2023/06')
+    fecha = models.CharField(max_length=10,default='2024/06')
     identificacion = models.CharField(max_length=100)
-    codigoDependenciaSucursal = models.CharField(max_length=100)
-    nomDependenciaSucursal = models.CharField(max_length=100)
-    fechaReporte = models.DateField()
     fechaLimitePago = models.DateField()
     periodoPension = models.CharField(max_length=7)
     periodoSalud = models.CharField(max_length=7)
-    totalCotizantes = models.IntegerField()
-    PIN = models.CharField(max_length=100)
     tipoPlanilla = models.CharField(max_length=100)
 
     class  Meta:
@@ -68,16 +63,13 @@ class infoPlanilla(models.Model):
 
     def __str__(self):
         return f"Fecha reporte: {self.fecha} - Número planilla: {self.numeroPlanilla}"
-    
+
 class valoresPlanilla(models.Model):
     codigoEntidad = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     NIT = models.CharField(max_length=50)
     numeroPlanilla = models.ForeignKey(infoPlanilla,on_delete=models.CASCADE)
-    numeroAfiliados = models.IntegerField()
     fondoSolidaridad = models.IntegerField(default=0)
     fondoSubsistencia = models.IntegerField(default=0)
-    totalIntereses = models.IntegerField(default=0)
-    valorPagarSinIntereses = models.IntegerField(default=0)
     valorPagar = models.IntegerField(default=0)
 
     class Meta:
@@ -87,7 +79,7 @@ class valoresPlanilla(models.Model):
 
     def __str__(self):
         return  f"{self.numeroPlanilla} - NIT:{self.NIT} - Valor a Pagar: {self.valorPagar}"
-    
+
 class valoresPatron(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     tipoPatronal = models.ForeignKey(Patronal,on_delete=models.CASCADE)
@@ -104,7 +96,7 @@ class valoresPatron(models.Model):
 
     def __str__(self):
         return f"Fecha:{self.fecha} {self.NIT} - {self.tipoPatronal} - Total: {self.total}"
-    
+
 class valoresEmpleado(models.Model):
     NIT = models.ForeignKey(Entidad,on_delete=models.CASCADE)
     fecha = models.CharField(max_length=10)

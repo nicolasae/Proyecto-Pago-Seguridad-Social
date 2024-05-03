@@ -12,15 +12,10 @@ field_mapping = {
     'razonSocial': 'RAZON SOCIAL',
     'fecha': 'PERIODO',
     'identificacion': 'IDENTIFICACION',
-    'codigoDependenciaSucursal': 'COD. DEPENDENCIA O SUCURSAL',
-    'nomDependenciaSucursal': 'NOM. DEPENDENCIA O SUCURSAL',
-    'fechaReporte': 'FECHA GENERACION REPORTE',
     'fechaLimitePago': 'FECHA LIMITE DE PAGO',
     'periodoPension': 'PERIODO PENSION',
     'periodoSalud': 'PERIODO SALUD',
     'numeroPlanilla': 'NUMERO PLANILLA',
-    'totalCotizantes': 'TOTAL COTIZANTES',
-    'PIN': 'REFERENCIA DE PAGO (PIN)',
     'tipoPlanilla': 'TIPO DE PLANILLA',
 }
 
@@ -84,12 +79,9 @@ def create_sheet_values_planilla(workbook):
         1: "CODIGO ENTIDAD",
         2: "NIT",
         3: "NOMBRE",
-        4: "NUMERO AFILIADOS",
-        5: "FONDO SOLIDARIDAD",
-        6: "FONDO SUBSISTENCIA",
-        7: "TOTAL INTERESES",
-        8: "VALOR PAGAR SIN INTERESES",
-        9: "VALOR PAGAR",
+        4: "FONDO SOLIDARIDAD",
+        5: "FONDO SUBSISTENCIA",
+        6: "VALOR PAGAR",
     }
 
     for col_idx, header_text in headers_sheet.items():
@@ -129,44 +121,33 @@ def write_values_planilla_data(sheet, values_planilla):
         # Filter values_planilla for the current razon_entidad
         values_planilla_filtered = values_planilla.filter(codigoEntidad__razonEntidad=razon_entidad)
 
-        suma_num_afiliados = 0
         suma_fondo_solidaridad = 0
         suma_fondo_subsistencia = 0
-        suma_intereses = 0
-        suma_sin_intereses = 0
         suma_total = 0
 
         for planilla in values_planilla_filtered: 
-            suma_num_afiliados += planilla.numeroAfiliados
             suma_fondo_solidaridad += planilla.fondoSolidaridad
             suma_fondo_subsistencia += planilla.fondoSubsistencia
-            suma_intereses += planilla.totalIntereses
-            suma_sin_intereses += planilla.valorPagarSinIntereses
             suma_total += planilla.valorPagar
 
             sheet[f"A{row_index}"] = planilla.codigoEntidad.codigo
             sheet[f"B{row_index}"] = planilla.NIT
             sheet[f"C{row_index}"] = planilla.codigoEntidad.concepto
-            sheet[f"D{row_index}"] = planilla.numeroAfiliados
-            sheet[f"E{row_index}"] = planilla.fondoSolidaridad
-            sheet[f"F{row_index}"] = planilla.fondoSubsistencia
-            sheet[f"G{row_index}"] = planilla.totalIntereses
-            sheet[f"H{row_index}"] = planilla.valorPagarSinIntereses
-            sheet[f"I{row_index}"] = planilla.valorPagar
+            sheet[f"D{row_index}"] = planilla.fondoSolidaridad
+            sheet[f"E{row_index}"] = planilla.fondoSubsistencia
+            sheet[f"F{row_index}"] = planilla.valorPagar
 
+            sheet[f"D{row_index}"].style = currency_style
             sheet[f"E{row_index}"].style = currency_style
             sheet[f"F{row_index}"].style = currency_style 
-            sheet[f"G{row_index}"].style = currency_style
-            sheet[f"H{row_index}"].style = currency_style 
-            sheet[f"I{row_index}"].style = currency_style
 
             # Add format styles 
-            columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I']
+            columns_to_style = ['A', 'B', 'C', 'D', 'E', 'F']
 
             for col in columns_to_style:
                 cell = f"{col}{row_index}"
 
-                if col in ['E', 'F','G', 'H','I']:
+                if col in ['D','E', 'F']:
                     sheet[cell].style = currency_style 
                 sheet[cell].font = font_style
                 sheet[cell].border = border_style
@@ -178,11 +159,8 @@ def write_values_planilla_data(sheet, values_planilla):
             "",
             "",
             f"SUBTOTAL {razon_entidad}",
-            suma_num_afiliados,
             suma_fondo_solidaridad,
             suma_fondo_subsistencia,
-            suma_intereses,
-            suma_sin_intereses,
             suma_total
         ]
 
@@ -193,7 +171,7 @@ def write_values_planilla_data(sheet, values_planilla):
 
         for col_idx, value in enumerate(total_data[3:], start=4):
             cell = sheet.cell(row=row_index, column=col_idx, value=value)
-            if col_idx > 4:
+            if col_idx > 3:
                 cell.style = currency_style
             cell.font = header_style
             cell.border = border_style
@@ -206,11 +184,8 @@ def write_values_planilla_data(sheet, values_planilla):
         "",
         "",
         "TOTAL",
-        values_planilla.aggregate(Sum('numeroAfiliados'))['numeroAfiliados__sum'],
         values_planilla.aggregate(Sum('fondoSolidaridad'))['fondoSolidaridad__sum'],
         values_planilla.aggregate(Sum('fondoSubsistencia'))['fondoSubsistencia__sum'],
-        values_planilla.aggregate(Sum('totalIntereses'))['totalIntereses__sum'],
-        values_planilla.aggregate(Sum('valorPagarSinIntereses'))['valorPagarSinIntereses__sum'],
         values_planilla.aggregate(Sum('valorPagar'))['valorPagar__sum']
     ]
 
@@ -222,7 +197,7 @@ def write_values_planilla_data(sheet, values_planilla):
     
     for col_idx, value in enumerate(grand_total_data[3:], start=4):
         cell = sheet.cell(row=row_index, column=col_idx, value=value)
-        if col_idx > 4:
+        if col_idx > 3:
             cell.style = currency_style
         cell.font = header_style
         cell.border = border_style
